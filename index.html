@@ -438,6 +438,83 @@
             color: rgba(255, 255, 255, 0.8);
             margin-bottom: 10px;
         }
+
+        .contacts-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .contact-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .contact-avatar {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            flex-shrink: 0;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .contact-info {
+            flex-grow: 1;
+        }
+
+        .contact-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 5px;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .contact-title {
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .call-button {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.3);
+        }
+
+        .call-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(56, 239, 125, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -449,7 +526,7 @@
 
     <div class="menu" id="menu">
         <a href="#" class="menu-item active-page" onclick="showPage('schedule')">⚡ Schedule</a>
-        <a href="#" class="menu-item" onclick="showPage('contacts')">📞 Contact Authorities</a>
+        <a href="#" class="menu-item" onclick="showPage('contacts')">📞 Authorities</a>
     </div>
 
     <div class="page active" id="schedulePage">
@@ -474,7 +551,7 @@
         </div>
 
         <div class="footer">
-            This site is put together by T, just to help everyone out.<br>
+            This site is put together by T & W, just to help everyone out.<br>
             Use it, share it, and I hope it makes things a little easier for all of us.
         </div>
     </div>
@@ -486,13 +563,35 @@
                 <div class="coming-soon-container">
                     <div class="coming-soon-icon">📞</div>
                     <h1 class="coming-soon-title">Coming Soon</h1>
-                    <p class="coming-soon-text">Contact details for electricity authorities</p>
-                    <p class="coming-soon-text">will be available here shortly.</p>
+                </div>
+                
+                <div class="contacts-container">
+                    <div class="contact-card">
+                        <div class="contact-avatar">👤</div>
+                        <div class="contact-info">
+                            <div class="contact-name">Lineman</div>
+                            <div class="contact-title">Power Supply Officer</div>
+                        </div>
+                        <a href="tel:+910000000000" class="call-button">
+                            📞 Call
+                        </a>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-avatar">👤</div>
+                        <div class="contact-info">
+                            <div class="contact-name">Electricity Inspector</div>
+                            <div class="contact-title">Field Inspector</div>
+                        </div>
+                        <a href="tel:+910000000000" class="call-button">
+                            📞 Call
+                        </a>
+                    </div>
                 </div>
             </div>
             
             <div class="footer">
-                This site is put together by T, just to help everyone out.<br>
+                This site is put together by T & W, just to help everyone out.<br>
                 Use it, share it, and I hope it makes things a little easier for all of us.
             </div>
         </div>
