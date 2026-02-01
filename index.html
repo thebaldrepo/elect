@@ -20,6 +20,103 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+
+        .hamburger {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        .menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-left: 2px solid rgba(255, 255, 255, 0.3);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            padding: 80px 30px 30px 30px;
+        }
+
+        .menu.active {
+            right: 0;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        .menu-item.active-page {
+            background: rgba(255, 255, 255, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
         }
 
         .container {
@@ -312,9 +409,50 @@
             font-size: 0.9em;
             line-height: 1.4;
         }
+
+        .coming-soon-container {
+            text-align: center;
+            padding: 100px 40px;
+        }
+
+        .coming-soon-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .coming-soon-title {
+            font-size: 3em;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .coming-soon-text {
+            font-size: 1.3em;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="menu" id="menu">
+        <a href="#" class="menu-item active-page" onclick="showPage('schedule')">⚡ Schedule</a>
+        <a href="#" class="menu-item" onclick="showPage('contacts')">📞 Contact Authorities</a>
+    </div>
+
+    <div class="page active" id="schedulePage">
     <div class="container">
         <div class="status-card" id="statusCard">
             <div class="status-icon" id="statusIcon">⚡</div>
@@ -338,6 +476,25 @@
         <div class="footer">
             This site is put together by T, just to help everyone out.<br>
             Use it, share it, and I hope it makes things a little easier for all of us.
+        </div>
+    </div>
+    </div>
+
+    <div class="page" id="contactsPage">
+        <div class="container">
+            <div class="status-card">
+                <div class="coming-soon-container">
+                    <div class="coming-soon-icon">📞</div>
+                    <h1 class="coming-soon-title">Coming Soon</h1>
+                    <p class="coming-soon-text">Contact details for electricity authorities</p>
+                    <p class="coming-soon-text">will be available here shortly.</p>
+                </div>
+            </div>
+            
+            <div class="footer">
+                This site is put together by T, just to help everyone out.<br>
+                Use it, share it, and I hope it makes things a little easier for all of us.
+            </div>
         </div>
     </div>
 
@@ -556,6 +713,35 @@
         updateStatus();
         displaySchedule();
         setInterval(updateStatus, 1000);
+
+        // Menu functions
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            const hamburger = document.getElementById('hamburger');
+            menu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        function showPage(pageName) {
+            // Hide all pages
+            document.getElementById('schedulePage').classList.remove('active');
+            document.getElementById('contactsPage').classList.remove('active');
+            
+            // Show selected page
+            if (pageName === 'schedule') {
+                document.getElementById('schedulePage').classList.add('active');
+            } else if (pageName === 'contacts') {
+                document.getElementById('contactsPage').classList.add('active');
+            }
+            
+            // Update active menu item
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => item.classList.remove('active-page'));
+            event.target.classList.add('active-page');
+            
+            // Close menu
+            toggleMenu();
+        }
     </script>
 </body>
 </html>
