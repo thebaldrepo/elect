@@ -450,19 +450,24 @@
                 for (let slot of todaySchedule) {
                     const endMinutes = timeToMinutes(slot.end);
                     if (currentMinutes < endMinutes) {
-                        nextChangeMinutes = endMinutes;
+                        // Check if this is 23:59 and tomorrow starts at 00:00 (continuous power)
+                        if (slot.end === '23:59' && tomorrowSchedule.length > 0 && tomorrowSchedule[0].start === '00:00') {
+                            // Power continues to tomorrow, find tomorrow's end time
+                            nextChangeMinutes = timeToMinutes(tomorrowSchedule[0].end) + 24 * 60;
+                        } else {
+                            nextChangeMinutes = endMinutes;
+                        }
                         break;
                     }
                 }
                 
-                // If no change today, check first OFF time tomorrow
+                // If no change found today, check tomorrow
                 if (!nextChangeMinutes && tomorrowSchedule.length > 0) {
-                    const firstSlot = tomorrowSchedule[0];
-                    if (firstSlot.start !== '00:00') {
-                        nextChangeMinutes = 24 * 60; // Midnight
+                    if (tomorrowSchedule[0].start === '00:00') {
+                        // Power continues from today to tomorrow
+                        nextChangeMinutes = timeToMinutes(tomorrowSchedule[0].end) + 24 * 60;
                     } else {
-                        // Find first gap in tomorrow's schedule
-                        nextChangeMinutes = timeToMinutes(firstSlot.end) + 24 * 60;
+                        nextChangeMinutes = 24 * 60; // Midnight
                     }
                 }
             } else {
