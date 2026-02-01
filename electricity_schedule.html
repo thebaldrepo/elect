@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electricity Schedule - Tapper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .status-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            transition: all 0.3s ease;
+        }
+
+        .status-on .status-icon {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            box-shadow: 0 10px 30px rgba(56, 239, 125, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .status-off .status-icon {
+            background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+            box-shadow: 0 10px 30px rgba(238, 9, 121, 0.4);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-text {
+            font-size: 1.3em;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .time-display {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+        }
+
+        .schedule-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .countdown-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 30px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .countdown-header {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .countdown-time {
+            font-size: 2em;
+            color: #ffffff;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .countdown-on {
+            border: 2px solid rgba(56, 239, 125, 0.5);
+            box-shadow: 0 0 20px rgba(56, 239, 125, 0.2);
+        }
+
+        .countdown-off {
+            border: 2px solid rgba(238, 9, 121, 0.5);
+            box-shadow: 0 0 20px rgba(238, 9, 121, 0.2);
+        }
+
+        .schedule-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .schedule-header h2 {
+            font-size: 2em;
+            color: #ffffff;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .day-schedule {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .day-schedule:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .day-schedule.active {
+            background: rgba(255, 255, 255, 0.25);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .day-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 10px;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .time-slots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .time-slot {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .time-slot.on {
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.3) 0%, rgba(56, 239, 125, 0.3) 100%);
+            border: 1px solid rgba(56, 239, 125, 0.6);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 0 15px rgba(56, 239, 125, 0.3);
+        }
+
+        .time-slot.off {
+            background: linear-gradient(135deg, #ee097915 0%, #ff6a0015 100%);
+            border: 1px solid #ff6a00;
+            color: #ee0979;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+
+        .schedule-input {
+            margin-bottom: 20px;
+        }
+
+        .schedule-input label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #4a5568;
+        }
+
+        .schedule-input textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .save-btn, .cancel-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2em; }
+            .status-card { padding: 30px 20px; }
+            .schedule-card { padding: 25px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-card" id="statusCard">
+            <div class="status-icon" id="statusIcon">⚡</div>
+            <h1 id="statusTitle">Checking...</h1>
+            <p class="status-text" id="statusText">Loading schedule...</p>
+            <p class="time-display" id="timeDisplay"></p>
+        </div>
+
+        <div class="countdown-card" id="countdownCard">
+            <div class="countdown-header" id="countdownHeader">Next Change</div>
+            <div class="countdown-time" id="countdownTime">Calculating...</div>
+        </div>
+
+        <div class="schedule-card">
+            <div class="schedule-header">
+                <h2>📅 Weekly Schedule</h2>
+            </div>
+            <div id="scheduleDisplay"></div>
+        </div>
+    </div>
+
+    <script>
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        // Actual electricity schedule
+        const schedule = {
+            Monday: [
+                {start: '00:00', end: '07:00', status: 'ON'},
+                {start: '09:00', end: '12:00', status: 'ON'},
+                {start: '15:00', end: '18:00', status: 'ON'},
+                {start: '20:00', end: '23:59', status: 'ON'}
+            ],
+            Tuesday: [
+                {start: '00:00', end: '09:00', status: 'ON'},
+                {start: '12:00', end: '15:00', status: 'ON'},
+                {start: '18:00', end: '20:00', status: 'ON'},
+                {start: '22:00', end: '23:59', status: 'ON'}
+            ],
+            Wednesday: [
+                {start: '00:00', end: '07:00', status: 'ON'},
+                {start: '09:00', end: '12:00', status: 'ON'},
+                {start: '15:00', end: '18:00', status: 'ON'},
+                {start: '20:00', end: '23:59', status: 'ON'}
+            ],
+            Thursday: [
+                {start: '00:00', end: '09:00', status: 'ON'},
+                {start: '12:00', end: '15:00', status: 'ON'},
+                {start: '18:00', end: '20:00', status: 'ON'},
+                {start: '22:00', end: '23:59', status: 'ON'}
+            ],
+            Friday: [
+                {start: '00:00', end: '07:00', status: 'ON'},
+                {start: '09:00', end: '12:00', status: 'ON'},
+                {start: '15:00', end: '18:00', status: 'ON'},
+                {start: '20:00', end: '23:59', status: 'ON'}
+            ],
+            Saturday: [
+                {start: '00:00', end: '09:00', status: 'ON'},
+                {start: '12:00', end: '15:00', status: 'ON'},
+                {start: '18:00', end: '20:00', status: 'ON'},
+                {start: '22:00', end: '23:59', status: 'ON'}
+            ],
+            Sunday: [
+                {start: '00:00', end: '07:00', status: 'ON'},
+                {start: '09:00', end: '12:00', status: 'ON'},
+                {start: '15:00', end: '18:00', status: 'ON'},
+                {start: '20:00', end: '23:59', status: 'ON'}
+            ]
+        };
+
+        function timeToMinutes(time) {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        function isElectricityOn() {
+            const now = new Date();
+            const day = days[now.getDay()];
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            
+            const todaySchedule = schedule[day];
+            for (let slot of todaySchedule) {
+                const startMinutes = timeToMinutes(slot.start);
+                const endMinutes = timeToMinutes(slot.end);
+                
+                if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function updateStatus() {
+            const now = new Date();
+            const isOn = isElectricityOn();
+            const card = document.getElementById('statusCard');
+            const icon = document.getElementById('statusIcon');
+            const title = document.getElementById('statusTitle');
+            const text = document.getElementById('statusText');
+            const timeDisplay = document.getElementById('timeDisplay');
+
+            if (isOn) {
+                card.className = 'status-card status-on';
+                icon.textContent = '💡';
+                title.textContent = 'Electricity is ON';
+                text.textContent = 'Power is currently available in Tapper';
+            } else {
+                card.className = 'status-card status-off';
+                icon.textContent = '🔌';
+                title.textContent = 'Electricity is OFF';
+                text.textContent = 'Power is currently unavailable in Tapper';
+            }
+
+            timeDisplay.textContent = now.toLocaleString('en-US', { 
+                weekday: 'long', 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            updateCountdown();
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+            const day = days[now.getDay()];
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const isOn = isElectricityOn();
+            
+            const countdownCard = document.getElementById('countdownCard');
+            const countdownHeader = document.getElementById('countdownHeader');
+            const countdownTime = document.getElementById('countdownTime');
+            
+            // Get all time slots for today and tomorrow
+            const todaySchedule = schedule[day];
+            const tomorrowDay = days[(now.getDay() + 1) % 7];
+            const tomorrowSchedule = schedule[tomorrowDay];
+            
+            let nextChangeMinutes = null;
+            
+            if (isOn) {
+                // Find when power will go OFF
+                for (let slot of todaySchedule) {
+                    const endMinutes = timeToMinutes(slot.end);
+                    if (currentMinutes < endMinutes) {
+                        nextChangeMinutes = endMinutes;
+                        break;
+                    }
+                }
+                
+                // If no change today, check first OFF time tomorrow
+                if (!nextChangeMinutes && tomorrowSchedule.length > 0) {
+                    const firstSlot = tomorrowSchedule[0];
+                    if (firstSlot.start !== '00:00') {
+                        nextChangeMinutes = 24 * 60; // Midnight
+                    } else {
+                        // Find first gap in tomorrow's schedule
+                        nextChangeMinutes = timeToMinutes(firstSlot.end) + 24 * 60;
+                    }
+                }
+            } else {
+                // Find when power will come ON
+                for (let slot of todaySchedule) {
+                    const startMinutes = timeToMinutes(slot.start);
+                    if (currentMinutes < startMinutes) {
+                        nextChangeMinutes = startMinutes;
+                        break;
+                    }
+                }
+                
+                // If no change today, check first ON time tomorrow
+                if (!nextChangeMinutes && tomorrowSchedule.length > 0) {
+                    nextChangeMinutes = timeToMinutes(tomorrowSchedule[0].start) + 24 * 60;
+                }
+            }
+            
+            if (nextChangeMinutes !== null) {
+                let minutesRemaining = nextChangeMinutes - currentMinutes;
+                if (minutesRemaining < 0) minutesRemaining += 24 * 60;
+                
+                const hours = Math.floor(minutesRemaining / 60);
+                const minutes = minutesRemaining % 60;
+                
+                let timeString = '';
+                if (hours > 0) {
+                    timeString = `${hours} hour${hours !== 1 ? 's' : ''}`;
+                    if (minutes > 0) {
+                        timeString += ` ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                    }
+                } else {
+                    timeString = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                }
+                
+                if (isOn) {
+                    countdownCard.className = 'countdown-card countdown-on';
+                    countdownHeader.textContent = '⚠️ Power Scheduled to Go OFF in:';
+                    countdownTime.textContent = timeString;
+                } else {
+                    countdownCard.className = 'countdown-card countdown-off';
+                    countdownHeader.textContent = '⚡ Power Scheduled to Come ON in:';
+                    countdownTime.textContent = timeString;
+                }
+            }
+        }
+
+        function displaySchedule() {
+            const container = document.getElementById('scheduleDisplay');
+            const now = new Date();
+            const currentDay = days[now.getDay()];
+            
+            container.innerHTML = days.map(day => {
+                const slots = schedule[day];
+                const isToday = day === currentDay;
+                
+                return `
+                    <div class="day-schedule ${isToday ? 'active' : ''}">
+                        <div class="day-name">${day}</div>
+                        <div class="time-slots">
+                            ${slots.map(slot => `
+                                <span class="time-slot on">⚡ ${slot.start} - ${slot.end}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize and update every second
+        updateStatus();
+        displaySchedule();
+        setInterval(updateStatus, 1000);
+    </script>
+</body>
+</html>
