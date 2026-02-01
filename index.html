@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -35,12 +34,63 @@
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 1001;
             transition: all 0.3s ease;
+            opacity: 1;
+            transform: translateY(0);
+            font-size: 28px;
+        }
+
+        .hamburger.hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+            pointer-events: none;
+        }
+
+        .hamburger-icon {
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active .hamburger-icon {
+            transform: rotate(90deg);
+            opacity: 0;
+        }
+
+        .hamburger-close {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            opacity: 0;
+            transform: rotate(-90deg);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-close::before,
+        .hamburger-close::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            top: 50%;
+            left: 50%;
+        }
+
+        .hamburger-close::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .hamburger-close::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        .hamburger.active .hamburger-close {
+            opacity: 1;
+            transform: rotate(0deg);
         }
 
         .hamburger:hover {
@@ -48,25 +98,8 @@
             transform: scale(1.05);
         }
 
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: white;
-            margin: 3px 0;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(8px, 8px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(8px, -8px);
+        .hamburger.hidden:hover {
+            transform: translateY(-20px);
         }
 
         .menu {
@@ -520,9 +553,8 @@
 </head>
 <body>
     <div class="hamburger" id="hamburger" onclick="toggleMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span class="hamburger-icon">⚡</span>
+        <span class="hamburger-close"></span>
     </div>
 
     <div class="menu" id="menu">
@@ -814,6 +846,29 @@
         displaySchedule();
         setInterval(updateStatus, 1000);
 
+        // Hamburger menu scroll behavior
+        let lastScrollTop = 0;
+        const hamburger = document.getElementById('hamburger');
+
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // If at top of page, always show hamburger
+            if (scrollTop <= 10) {
+                hamburger.classList.remove('hidden');
+            } 
+            // If scrolling down, hide hamburger
+            else if (scrollTop > lastScrollTop) {
+                hamburger.classList.add('hidden');
+            } 
+            // If scrolling up, show hamburger
+            else {
+                hamburger.classList.remove('hidden');
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
         // Menu functions
         function toggleMenu() {
             const menu = document.getElementById('menu');
@@ -841,6 +896,9 @@
             
             // Close menu
             toggleMenu();
+            
+            // Scroll to top of new page
+            window.scrollTo(0, 0);
         }
     </script>
 </body>
