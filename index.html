@@ -15,34 +15,167 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0a4d4e 0%, #1a6565 100%);
             min-height: 100vh;
             padding: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a4d4e 0%, #1a6565 100%);
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { 
+                background: linear-gradient(135deg, #0a4d4e 0%, #1a6565 100%);
+            }
+            50% { 
+                background: linear-gradient(135deg, #1a6565 0%, #0a4d4e 100%);
+            }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float-particle linear infinite;
+        }
+
+        @keyframes float-particle {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
         }
 
         .hamburger {
             position: fixed;
             top: 20px;
             right: 20px;
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
+            width: 55px;
+            height: 55px;
+            background: rgba(26, 239, 177, 0.25);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(26, 239, 177, 0.4);
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 1001;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 1;
             transform: translateY(0);
             font-size: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .hamburger.pulse {
+            animation: pulse-hint 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-hint {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 8px 32px rgba(26, 239, 177, 0.5);
+            }
+        }
+
+        .hamburger-label {
+            position: absolute;
+            top: -35px;
+            right: 0;
+            background: rgba(26, 239, 177, 0.95);
+            color: #0a4d4e;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .hamburger-label.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hamburger-label::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            right: 15px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid rgba(26, 239, 177, 0.95);
+        }
+
+        .hamburger:hover .hamburger-tooltip {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hamburger-tooltip {
+            position: absolute;
+            top: -35px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
         }
 
         .hamburger.hidden {
@@ -52,7 +185,7 @@
         }
 
         .hamburger-icon {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .hamburger.active .hamburger-icon {
@@ -66,7 +199,7 @@
             height: 30px;
             opacity: 0;
             transform: rotate(-90deg);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .hamburger-close::before,
@@ -95,26 +228,45 @@
         }
 
         .hamburger:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
+            background: rgba(26, 239, 177, 0.35);
+            transform: scale(1.08) translateY(0);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
         }
 
         .hamburger.hidden:hover {
             transform: translateY(-20px);
         }
 
+        /* Ripple Effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(26, 239, 177, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
         .menu {
             position: fixed;
             top: 0;
-            right: -300px;
-            width: 300px;
+            right: -320px;
+            width: 320px;
             height: 100vh;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            border-left: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(13, 77, 78, 0.95);
+            backdrop-filter: blur(25px);
+            border-left: 2px solid rgba(26, 239, 177, 0.35);
             z-index: 1000;
-            transition: right 0.3s ease;
-            padding: 80px 30px 30px 30px;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 90px 30px 30px 30px;
+            box-shadow: -10px 0 50px rgba(0, 0, 0, 0.4);
         }
 
         .menu.active {
@@ -123,393 +275,602 @@
 
         .menu-item {
             display: block;
-            padding: 15px 20px;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
+            padding: 18px 24px;
+            margin-bottom: 12px;
+            background: rgba(26, 239, 177, 0.15);
+            border: 1.5px solid rgba(26, 239, 177, 0.35);
+            border-radius: 14px;
             color: white;
             text-decoration: none;
-            font-size: 1.1em;
+            font-size: 1.15em;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
         }
 
         .menu-item:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateX(-5px);
+            background: rgba(26, 239, 177, 0.25);
+            transform: translateX(-8px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
         }
 
         .menu-item.active-page {
-            background: rgba(255, 255, 255, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.6);
+            background: rgba(26, 239, 177, 0.35);
+            border: 2px solid rgba(26, 239, 177, 0.65);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
         .page {
             display: none;
+            position: relative;
+            z-index: 1;
         }
 
         .page.active {
             display: block;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .container {
-            max-width: 900px;
+            max-width: 920px;
             width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-enter {
+            animation: cardEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes cardEnter {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .status-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 30px;
-            padding: 50px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            background: rgba(13, 77, 78, 0.6);
+            backdrop-filter: blur(25px);
+            border: 2px solid rgba(26, 239, 177, 0.25);
+            border-radius: 32px;
+            padding: 55px 45px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4), 
+                        inset 0 1px 0 rgba(26, 239, 177, 0.2);
             margin-bottom: 30px;
             text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .status-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 
+                        inset 0 1px 0 rgba(26, 239, 177, 0.3);
+        }
+
+        /* Glow effects */
+        .status-card.status-on::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, rgba(56, 239, 125, 0.5), transparent);
+            border-radius: 32px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .status-card.status-on:hover::before {
+            opacity: 1;
+        }
+
+        .status-card.status-off::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, rgba(238, 9, 121, 0.5), transparent);
+            border-radius: 32px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .status-card.status-off:hover::before {
+            opacity: 1;
         }
 
         .status-icon {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 30px;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 35px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 60px;
-            transition: all 0.3s ease;
+            font-size: 65px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
         .status-on .status-icon {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            box-shadow: 0 10px 30px rgba(56, 239, 125, 0.4);
-            animation: pulse 2s infinite;
+            box-shadow: 0 15px 40px rgba(56, 239, 125, 0.45),
+                        0 0 60px rgba(56, 239, 125, 0.3);
+            animation: pulse-glow 2s ease-in-out infinite;
         }
 
         .status-off .status-icon {
             background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-            box-shadow: 0 10px 30px rgba(238, 9, 121, 0.4);
+            box-shadow: 0 15px 40px rgba(238, 9, 121, 0.45),
+                        0 0 60px rgba(238, 9, 121, 0.3);
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        @keyframes pulse-glow {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 15px 40px rgba(56, 239, 125, 0.45),
+                            0 0 60px rgba(56, 239, 125, 0.3);
+            }
+            50% { 
+                transform: scale(1.06);
+                box-shadow: 0 20px 50px rgba(56, 239, 125, 0.6),
+                            0 0 80px rgba(56, 239, 125, 0.5);
+            }
         }
 
         h1 {
-            font-size: 2.5em;
-            margin-bottom: 15px;
+            font-size: 2.6em;
+            margin-bottom: 16px;
             color: #ffffff;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+            letter-spacing: -0.5px;
         }
 
         .status-text {
-            font-size: 1.3em;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 20px;
-            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+            font-size: 1.35em;
+            color: rgba(255, 255, 255, 0.92);
+            margin-bottom: 22px;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            font-weight: 500;
         }
 
         .time-display {
-            font-size: 1.1em;
-            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.12em;
+            color: rgba(255, 255, 255, 0.75);
             margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        /* Quick Stats Card */
+        .quick-stats {
+            background: rgba(13, 77, 78, 0.6);
+            backdrop-filter: blur(25px);
+            border: 2px solid rgba(26, 239, 177, 0.25);
+            border-radius: 32px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .quick-stats:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #1aefb1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: 500;
+        }
+
+        /* Timeline */
+        .timeline-card {
+            background: rgba(13, 77, 78, 0.6);
+            backdrop-filter: blur(25px);
+            border: 2px solid rgba(26, 239, 177, 0.25);
+            border-radius: 32px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .timeline-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .timeline-header h3 {
+            font-size: 1.5em;
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-container {
+            position: relative;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .timeline-slots {
+            display: flex;
+            height: 100%;
+            position: relative;
+        }
+
+        .timeline-slot {
+            height: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .timeline-slot.on {
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.6), rgba(56, 239, 125, 0.6));
+        }
+
+        .timeline-slot.off {
+            background: linear-gradient(135deg, rgba(238, 9, 121, 0.4), rgba(255, 106, 0, 0.4));
+        }
+
+        .timeline-marker {
+            position: absolute;
+            top: -5px;
+            bottom: -5px;
+            width: 3px;
+            background: #1aefb1;
+            box-shadow: 0 0 10px rgba(26, 239, 177, 0.8);
+            z-index: 10;
+            animation: marker-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes marker-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .timeline-marker::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #1aefb1;
         }
 
         .schedule-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 30px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            background: rgba(13, 77, 78, 0.6);
+            backdrop-filter: blur(25px);
+            border: 2px solid rgba(26, 239, 177, 0.25);
+            border-radius: 32px;
+            padding: 45px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4),
+                        inset 0 1px 0 rgba(26, 239, 177, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .schedule-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(26, 239, 177, 0.3);
         }
 
         .countdown-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 30px;
-            padding: 30px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            background: rgba(13, 77, 78, 0.6);
+            backdrop-filter: blur(25px);
+            border: 2px solid rgba(26, 239, 177, 0.25);
+            border-radius: 32px;
+            padding: 35px 45px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4),
+                        inset 0 1px 0 rgba(26, 239, 177, 0.2);
             margin-bottom: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .countdown-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(26, 239, 177, 0.3);
+        }
+
+        /* Progress Ring */
+        .progress-ring {
+            margin: 20px auto;
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .progress-ring-circle {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .progress-ring-background {
+            fill: none;
+            stroke: rgba(26, 239, 177, 0.2);
+            stroke-width: 8;
+        }
+
+        .progress-ring-progress {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .countdown-on .progress-ring-progress {
+            stroke: url(#gradient-on);
+        }
+
+        .countdown-off .progress-ring-progress {
+            stroke: url(#gradient-off);
+        }
+
+        .progress-ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             text-align: center;
         }
 
         .countdown-header {
-            font-size: 1.2em;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 10px;
-            font-weight: 500;
+            font-size: 1.25em;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 12px;
+            font-weight: 600;
         }
 
         .countdown-time {
-            font-size: 2em;
+            font-size: 2.2em;
             color: #ffffff;
-            font-weight: bold;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            font-weight: 700;
+            text-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+            letter-spacing: -0.5px;
         }
 
         .countdown-on {
-            border: 2px solid rgba(56, 239, 125, 0.5);
-            box-shadow: 0 0 20px rgba(56, 239, 125, 0.2);
+            border: 2.5px solid rgba(56, 239, 125, 0.55);
+            box-shadow: 0 0 30px rgba(56, 239, 125, 0.25), 0 25px 70px rgba(0, 0, 0, 0.4);
         }
 
         .countdown-off {
-            border: 2px solid rgba(238, 9, 121, 0.5);
-            box-shadow: 0 0 20px rgba(238, 9, 121, 0.2);
+            border: 2.5px solid rgba(238, 9, 121, 0.55);
+            box-shadow: 0 0 30px rgba(238, 9, 121, 0.25), 0 25px 70px rgba(0, 0, 0, 0.4);
         }
 
         .schedule-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
         .schedule-header h2 {
-            font-size: 2em;
+            font-size: 2.1em;
             color: #ffffff;
             margin-bottom: 10px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .edit-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: transform 0.2s;
-            margin-top: 10px;
-        }
-
-        .edit-btn:hover {
-            transform: translateY(-2px);
+            text-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+            letter-spacing: -0.5px;
         }
 
         .day-schedule {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
+            background: rgba(26, 239, 177, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(26, 239, 177, 0.25);
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .day-schedule:hover {
-            transform: translateX(5px);
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(6px);
+            background: rgba(26, 239, 177, 0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(26, 239, 177, 0.35);
         }
 
         .day-schedule.active {
-            background: rgba(255, 255, 255, 0.25);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            background: rgba(26, 239, 177, 0.2);
+            border: 2.5px solid rgba(26, 239, 177, 0.55);
+            box-shadow: 0 0 30px rgba(26, 239, 177, 0.35), 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
         .day-name {
-            font-size: 1.3em;
-            font-weight: bold;
+            font-size: 1.35em;
+            font-weight: 700;
             color: #ffffff;
-            margin-bottom: 10px;
-            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+            margin-bottom: 14px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            letter-spacing: -0.3px;
         }
 
         .time-slots {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
 
         .time-slot {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-size: 0.95em;
+            background: rgba(26, 239, 177, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 0.98em;
             color: #ffffff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1.5px solid rgba(26, 239, 177, 0.35);
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .time-slot:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
         }
 
         .time-slot.on {
-            background: linear-gradient(135deg, rgba(17, 153, 142, 0.3) 0%, rgba(56, 239, 125, 0.3) 100%);
-            border: 1px solid rgba(56, 239, 125, 0.6);
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.35) 0%, rgba(56, 239, 125, 0.35) 100%);
+            border: 1.5px solid rgba(56, 239, 125, 0.65);
             color: #ffffff;
-            font-weight: 600;
-            box-shadow: 0 0 15px rgba(56, 239, 125, 0.3);
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(56, 239, 125, 0.35), 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .time-slot.off {
-            background: linear-gradient(135deg, #ee097915 0%, #ff6a0015 100%);
-            border: 1px solid #ff6a00;
-            color: #ee0979;
-            font-weight: 600;
+        .time-slot.current {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.5) 0%, rgba(255, 165, 0, 0.5) 100%);
+            border: 2px solid rgba(255, 215, 0, 0.8);
+            animation: current-slot-pulse 2s ease-in-out infinite;
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-content h3 {
-            margin-bottom: 20px;
-            color: #2d3748;
-        }
-
-        .schedule-input {
-            margin-bottom: 20px;
-        }
-
-        .schedule-input label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #4a5568;
-        }
-
-        .schedule-input textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-family: monospace;
-            resize: vertical;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .save-btn, .cancel-btn {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-        }
-
-        .save-btn {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
-        }
-
-        .cancel-btn {
-            background: #e2e8f0;
-            color: #4a5568;
-        }
-
-        @media (max-width: 600px) {
-            h1 { font-size: 2em; }
-            .status-card { padding: 30px 20px; }
-            .schedule-card { padding: 25px 20px; }
+        @keyframes current-slot-pulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.6), 0 6px 20px rgba(0, 0, 0, 0.35);
+            }
         }
 
         .footer {
             text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            color: rgba(255, 255, 255, 0.6);
+            margin-top: 35px;
+            padding: 24px;
+            color: rgba(255, 255, 255, 0.68);
             font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            line-height: 1.4;
+            font-size: 0.92em;
+            line-height: 1.6;
+            background: rgba(26, 239, 177, 0.08);
+            border-radius: 18px;
+            backdrop-filter: blur(10px);
         }
 
         .coming-soon-container {
             text-align: center;
-            padding: 100px 40px;
+            padding: 110px 45px;
         }
 
         .coming-soon-icon {
-            font-size: 80px;
-            margin-bottom: 30px;
+            font-size: 88px;
+            margin-bottom: 35px;
             animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+            50% { transform: translateY(-22px); }
         }
 
         .coming-soon-title {
-            font-size: 3em;
+            font-size: 3.2em;
             color: #ffffff;
-            margin-bottom: 20px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .coming-soon-text {
-            font-size: 1.3em;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 10px;
+            margin-bottom: 22px;
+            text-shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
+            letter-spacing: -1px;
         }
 
         .contacts-container {
-            max-width: 600px;
+            max-width: 620px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 22px;
         }
 
         .contact-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
+            background: rgba(26, 239, 177, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(26, 239, 177, 0.25);
+            border-radius: 22px;
+            padding: 28px;
+            margin-bottom: 22px;
             display: flex;
             align-items: center;
-            gap: 20px;
-            transition: all 0.3s ease;
+            gap: 22px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
         .contact-card:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(26, 239, 177, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(26, 239, 177, 0.35);
         }
 
         .contact-avatar {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 75px;
+            height: 75px;
+            background: linear-gradient(135deg, #0a4d4e 0%, #1aefb1 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 35px;
+            font-size: 38px;
             flex-shrink: 0;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(26, 239, 177, 0.35);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
         .contact-info {
@@ -517,45 +878,119 @@
         }
 
         .contact-name {
-            font-size: 1.3em;
-            font-weight: bold;
+            font-size: 1.35em;
+            font-weight: 700;
             color: #ffffff;
-            margin-bottom: 5px;
-            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+            margin-bottom: 6px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            letter-spacing: -0.3px;
         }
 
         .contact-title {
-            font-size: 0.95em;
-            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.98em;
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: 500;
         }
 
         .call-button {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 15px;
+            padding: 14px 28px;
+            border-radius: 16px;
             cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
+            font-size: 1.02em;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
+            gap: 9px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
-            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.3);
+            box-shadow: 0 8px 25px rgba(56, 239, 125, 0.35);
+            position: relative;
+            overflow: hidden;
         }
 
         .call-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(56, 239, 125, 0.4);
+            transform: scale(1.08);
+            box-shadow: 0 12px 35px rgba(56, 239, 125, 0.45);
+        }
+
+        .call-button:active {
+            transform: scale(1.02);
+        }
+
+        /* Pull to refresh indicator */
+        .pull-indicator {
+            position: fixed;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 239, 177, 0.9);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            color: #0a4d4e;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: top 0.3s ease;
+            z-index: 2000;
+        }
+
+        .pull-indicator.show {
+            top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .quick-stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .timeline-container {
+                height: 60px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.1em; }
+            .status-card { padding: 35px 22px; }
+            .schedule-card { padding: 28px 22px; }
+            .status-icon {
+                width: 110px;
+                height: 110px;
+                font-size: 55px;
+            }
+            .countdown-time { font-size: 1.8em; }
+            .coming-soon-title { font-size: 2.4em; }
+            .time-slots { gap: 8px; }
+            .time-slot { 
+                padding: 8px 14px; 
+                font-size: 0.9em;
+            }
+            .progress-ring {
+                width: 150px;
+                height: 150px;
+            }
+            .stat-value { font-size: 2em; }
+            .timeline-card { padding: 25px 20px; }
         }
     </style>
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="bg-gradient"></div>
+        <div class="particles" id="particles"></div>
+    </div>
+
+    <!-- Pull to refresh indicator -->
+    <div class="pull-indicator" id="pullIndicator">↓ Pull to refresh</div>
+
     <div class="hamburger" id="hamburger" onclick="toggleMenu()">
         <span class="hamburger-icon">⚡</span>
         <span class="hamburger-close"></span>
+        <span class="hamburger-label" id="hamburgerLabel">Menu →</span>
+        <span class="hamburger-tooltip">Menu</span>
     </div>
 
     <div class="menu" id="menu">
@@ -565,19 +1000,60 @@
 
     <div class="page active" id="schedulePage">
     <div class="container">
-        <div class="status-card" id="statusCard">
+        <div class="status-card card-enter" id="statusCard">
             <div class="status-icon" id="statusIcon">⚡</div>
             <h1 id="statusTitle">Checking...</h1>
             <p class="status-text" id="statusText">Loading schedule...</p>
             <p class="time-display" id="timeDisplay"></p>
         </div>
 
-        <div class="countdown-card" id="countdownCard">
-            <div class="countdown-header" id="countdownHeader">Next Change</div>
-            <div class="countdown-time" id="countdownTime">Calculating...</div>
+        <div class="quick-stats card-enter" id="quickStats" style="animation-delay: 0.1s">
+            <div class="stat-item">
+                <div class="stat-value" id="totalOnHours">0</div>
+                <div class="stat-label">Hours ON Today</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalOffHours">0</div>
+                <div class="stat-label">Hours OFF Today</div>
+            </div>
         </div>
 
-        <div class="schedule-card">
+        <div class="countdown-card card-enter" id="countdownCard" style="animation-delay: 0.2s">
+            <div class="countdown-header" id="countdownHeader">Next Change</div>
+
+            <svg class="progress-ring" viewBox="0 0 200 200">
+                <defs>
+                    <linearGradient id="gradient-on" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#11998e;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#38ef7d;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="gradient-off" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ee0979;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#ff6a00;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle class="progress-ring-background" cx="100" cy="100" r="90"/>
+                <circle class="progress-ring-circle progress-ring-progress" id="progressCircle" cx="100" cy="100" r="90"
+                    stroke-dasharray="565.48" stroke-dashoffset="0"/>
+                <foreignObject x="0" y="0" width="200" height="200">
+                    <div class="progress-ring-text" xmlns="http://www.w3.org/1999/xhtml">
+                        <div class="countdown-time" id="countdownTime">Calculating...</div>
+                    </div>
+                </foreignObject>
+            </svg>
+        </div>
+
+        <div class="timeline-card card-enter" id="timelineCard" style="animation-delay: 0.3s">
+            <div class="timeline-header">
+                <h3>⏰ Today's Timeline</h3>
+            </div>
+            <div class="timeline-container">
+                <div class="timeline-slots" id="timelineSlots"></div>
+                <div class="timeline-marker" id="timelineMarker"></div>
+            </div>
+        </div>
+
+        <div class="schedule-card card-enter" style="animation-delay: 0.4s">
             <div class="schedule-header">
                 <h2>📅 Weekly Schedule</h2>
             </div>
@@ -598,7 +1074,7 @@
                     <div class="coming-soon-icon">📞</div>
                     <h1 class="coming-soon-title">Coming Soon</h1>
                 </div>
-                
+
                 <div class="contacts-container">
                     <div class="contact-card">
                         <div class="contact-avatar">👤</div>
@@ -606,7 +1082,7 @@
                             <div class="contact-name">Lineman</div>
                             <div class="contact-title">Power Supply Officer</div>
                         </div>
-                        <a href="tel:+910000000000" class="call-button">
+                        <a href="tel:+9.1e+11" class="call-button">
                             📞 Call
                         </a>
                     </div>
@@ -617,13 +1093,13 @@
                             <div class="contact-name">Electricity Inspector</div>
                             <div class="contact-title">Field Inspector</div>
                         </div>
-                        <a href="tel:+910000000000" class="call-button">
+                        <a href="tel:+9.1e+11" class="call-button">
                             📞 Call
                         </a>
                     </div>
                 </div>
             </div>
-            
+
             <div class="footer">
                 This site is put together by T & W, just to help everyone out.<br>
                 Use it, share it, and I hope it makes things a little easier for all of us.
@@ -633,7 +1109,7 @@
 
     <script>
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        
+
         // Actual electricity schedule
         const schedule = {
             Monday: [
@@ -680,6 +1156,63 @@
             ]
         };
 
+        // First-time visitor detection
+        let isFirstVisit = !localStorage.getItem('visited');
+        if (isFirstVisit) {
+            localStorage.setItem('visited', 'true');
+            const hamburger = document.getElementById('hamburger');
+            const label = document.getElementById('hamburgerLabel');
+
+            hamburger.classList.add('pulse');
+            label.classList.add('show');
+
+            setTimeout(() => {
+                label.classList.remove('show');
+            }, 5000);
+        }
+
+        // Create particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 6 + 3 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        createParticles();
+
+        // Ripple effect
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = event.clientX - rect.left - size / 2;
+            const y = event.clientY - rect.top - size / 2;
+
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+
+            button.appendChild(ripple);
+
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        // Add ripple to buttons
+        document.querySelectorAll('.menu-item, .call-button').forEach(btn => {
+            btn.addEventListener('click', createRipple);
+        });
+
         function timeToMinutes(time) {
             const [hours, minutes] = time.split(':').map(Number);
             return hours * 60 + minutes;
@@ -689,17 +1222,118 @@
             const now = new Date();
             const day = days[now.getDay()];
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
-            
+
             const todaySchedule = schedule[day];
             for (let slot of todaySchedule) {
                 const startMinutes = timeToMinutes(slot.start);
                 const endMinutes = timeToMinutes(slot.end);
-                
+
                 if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
                     return true;
                 }
             }
             return false;
+        }
+
+        function calculateDailyStats() {
+            const now = new Date();
+            const day = days[now.getDay()];
+            const todaySchedule = schedule[day];
+
+            let totalOnMinutes = 0;
+            todaySchedule.forEach(slot => {
+                const start = timeToMinutes(slot.start);
+                const end = timeToMinutes(slot.end);
+                totalOnMinutes += (end - start);
+            });
+
+            const totalOnHours = (totalOnMinutes / 60).toFixed(1);
+            const totalOffHours = (24 - totalOnHours).toFixed(1);
+
+            document.getElementById('totalOnHours').textContent = totalOnHours;
+            document.getElementById('totalOffHours').textContent = totalOffHours;
+        }
+
+        function updateTimeline() {
+            const now = new Date();
+            const day = days[now.getDay()];
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const todaySchedule = schedule[day];
+
+            const container = document.getElementById('timelineSlots');
+            container.innerHTML = '';
+
+            let allSlots = [];
+
+            // Create all slots for the day
+            for (let i = 0; i < todaySchedule.length; i++) {
+                const onSlot = todaySchedule[i];
+                const onStart = timeToMinutes(onSlot.start);
+                const onEnd = timeToMinutes(onSlot.end);
+
+                allSlots.push({
+                    start: onStart,
+                    end: onEnd,
+                    status: 'ON'
+                });
+
+                // Add OFF slot if there's a gap
+                if (i < todaySchedule.length - 1) {
+                    const nextOnSlot = todaySchedule[i + 1];
+                    const nextOnStart = timeToMinutes(nextOnSlot.start);
+
+                    if (onEnd < nextOnStart) {
+                        allSlots.push({
+                            start: onEnd,
+                            end: nextOnStart,
+                            status: 'OFF'
+                        });
+                    }
+                }
+            }
+
+            // Sort slots
+            allSlots.sort((a, b) => a.start - b.start);
+
+            // Add initial OFF slot if day doesn't start at 00:00
+            if (allSlots[0].start > 0) {
+                allSlots.unshift({
+                    start: 0,
+                    end: allSlots[0].start,
+                    status: 'OFF'
+                });
+            }
+
+            // Add final OFF slot if day doesn't end at 23:59
+            const lastSlot = allSlots[allSlots.length - 1];
+            if (lastSlot.end < 1439) {
+                allSlots.push({
+                    start: lastSlot.end,
+                    end: 1440,
+                    status: 'OFF'
+                });
+            }
+
+            // Render slots
+            allSlots.forEach(slot => {
+                const duration = slot.end - slot.start;
+                const percentage = (duration / 1440) * 100;
+
+                const slotDiv = document.createElement('div');
+                slotDiv.className = `timeline-slot ${slot.status.toLowerCase()}`;
+                slotDiv.style.width = percentage + '%';
+
+                const startHour = Math.floor(slot.start / 60);
+                const endHour = Math.floor(slot.end / 60);
+                slotDiv.textContent = `${startHour}:00`;
+
+                container.appendChild(slotDiv);
+            });
+
+            // Position marker
+            const marker = document.getElementById('timelineMarker');
+            const currentPercentage = (currentMinutes / 1440) * 100;
+            marker.style.left = currentPercentage + '%';
         }
 
         function updateStatus() {
@@ -712,12 +1346,12 @@
             const timeDisplay = document.getElementById('timeDisplay');
 
             if (isOn) {
-                card.className = 'status-card status-on';
+                card.className = 'status-card status-on card-enter';
                 icon.textContent = '💡';
                 title.textContent = 'Electricity is ON';
                 text.textContent = 'Power is currently available in Tapper';
             } else {
-                card.className = 'status-card status-off';
+                card.className = 'status-card status-off card-enter';
                 icon.textContent = '🔌';
                 title.textContent = 'Electricity is OFF';
                 text.textContent = 'Power is currently unavailable in Tapper';
@@ -731,6 +1365,7 @@
             });
 
             updateCountdown();
+            updateTimeline();
         }
 
         function updateCountdown() {
@@ -738,82 +1373,101 @@
             const day = days[now.getDay()];
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
             const isOn = isElectricityOn();
-            
+
             const countdownCard = document.getElementById('countdownCard');
             const countdownHeader = document.getElementById('countdownHeader');
             const countdownTime = document.getElementById('countdownTime');
-            
-            // Get all time slots for today and tomorrow
+            const progressCircle = document.getElementById('progressCircle');
+
             const todaySchedule = schedule[day];
             const tomorrowDay = days[(now.getDay() + 1) % 7];
             const tomorrowSchedule = schedule[tomorrowDay];
-            
+
             let nextChangeMinutes = null;
-            
+            let totalDuration = 0;
+            let startMinutes = 0;
+
             if (isOn) {
-                // Find when power will go OFF
+                // Find current ON slot
                 for (let slot of todaySchedule) {
+                    startMinutes = timeToMinutes(slot.start);
                     const endMinutes = timeToMinutes(slot.end);
-                    if (currentMinutes < endMinutes) {
-                        // Check if this is 23:59 and tomorrow starts at 00:00 (continuous power)
+
+                    if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+                        // Check if this slot ends at 23:59 and tomorrow starts at 00:00
                         if (slot.end === '23:59' && tomorrowSchedule.length > 0 && tomorrowSchedule[0].start === '00:00') {
-                            // Power continues to tomorrow, find tomorrow's end time
+                            // Power continues to tomorrow, find tomorrow's actual end time
                             nextChangeMinutes = timeToMinutes(tomorrowSchedule[0].end) + 24 * 60;
+                            totalDuration = (24 * 60 - startMinutes) + timeToMinutes(tomorrowSchedule[0].end);
                         } else {
                             nextChangeMinutes = endMinutes;
+                            totalDuration = endMinutes - startMinutes;
                         }
                         break;
                     }
                 }
-                
-                // If no change found today, check tomorrow
-                if (!nextChangeMinutes && tomorrowSchedule.length > 0) {
-                    if (tomorrowSchedule[0].start === '00:00') {
-                        // Power continues from today to tomorrow
-                        nextChangeMinutes = timeToMinutes(tomorrowSchedule[0].end) + 24 * 60;
-                    } else {
-                        nextChangeMinutes = 24 * 60; // Midnight
-                    }
-                }
             } else {
-                // Find when power will come ON
+                // Find next ON slot
                 for (let slot of todaySchedule) {
-                    const startMinutes = timeToMinutes(slot.start);
-                    if (currentMinutes < startMinutes) {
-                        nextChangeMinutes = startMinutes;
+                    const slotStartMinutes = timeToMinutes(slot.start);
+                    if (currentMinutes < slotStartMinutes) {
+                        nextChangeMinutes = slotStartMinutes;
+
+                        // Find duration of OFF period
+                        let prevEnd = 0;
+                        for (let s of todaySchedule) {
+                            const sEnd = timeToMinutes(s.end);
+                            if (sEnd <= currentMinutes) {
+                                prevEnd = sEnd;
+                            }
+                        }
+                        totalDuration = slotStartMinutes - (prevEnd || 0);
                         break;
                     }
                 }
-                
-                // If no change today, check first ON time tomorrow
+
+                // If no change found today, check tomorrow
                 if (!nextChangeMinutes && tomorrowSchedule.length > 0) {
                     nextChangeMinutes = timeToMinutes(tomorrowSchedule[0].start) + 24 * 60;
+
+                    // Find when power went OFF today
+                    let lastOnEnd = 0;
+                    for (let s of todaySchedule) {
+                        const sEnd = timeToMinutes(s.end);
+                        if (sEnd <= currentMinutes) {
+                            lastOnEnd = sEnd;
+                        }
+                    }
+                    totalDuration = nextChangeMinutes - (lastOnEnd || currentMinutes);
                 }
             }
-            
+
             if (nextChangeMinutes !== null) {
                 let minutesRemaining = nextChangeMinutes - currentMinutes;
                 if (minutesRemaining < 0) minutesRemaining += 24 * 60;
-                
+
+                // Update progress ring
+                const circumference = 565.48;
+                const progress = 1 - (minutesRemaining / totalDuration);
+                const offset = circumference * (1 - progress);
+                progressCircle.style.strokeDashoffset = offset;
+
                 const hours = Math.floor(minutesRemaining / 60);
                 const minutes = minutesRemaining % 60;
-                
+
                 let timeString = '';
                 if (hours > 0) {
-                    timeString = `${hours} hour${hours !== 1 ? 's' : ''}`;
-                    if (minutes > 0) {
-                        timeString += ` ${minutes} minute${minutes !== 1 ? 's' : ''}`;
-                    }
+                    timeString = `${hours}h ${minutes}m`;
                 } else {
-                    timeString = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                    timeString = `${minutes}m`;
                 }
-                
+
                 if (isOn) {
-                    countdownCard.className = 'countdown-card countdown-on';
+                    countdownCard.className = 'countdown-card countdown-on card-enter';
                     countdownHeader.textContent = '⚠️ Electricity going OFF in:';
                     countdownTime.textContent = timeString;
                 } else {
-                    countdownCard.className = 'countdown-card countdown-off';
+                    countdownCard.className = 'countdown-card countdown-off card-enter';
                     countdownHeader.textContent = '⚡ Electricity will be available in:';
                     countdownTime.textContent = timeString;
                 }
@@ -824,27 +1478,33 @@
             const container = document.getElementById('scheduleDisplay');
             const now = new Date();
             const currentDay = days[now.getDay()];
-            
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
             container.innerHTML = days.map(day => {
                 const slots = schedule[day];
                 const isToday = day === currentDay;
-                
+
                 return `
                     <div class="day-schedule ${isToday ? 'active' : ''}">
                         <div class="day-name">${day}</div>
                         <div class="time-slots">
-                            ${slots.map(slot => `
-                                <span class="time-slot on">⚡ ${slot.start} - ${slot.end}</span>
-                            `).join('')}
+                            ${slots.map(slot => {
+                                const startMin = timeToMinutes(slot.start);
+                                const endMin = timeToMinutes(slot.end);
+                                const isCurrent = isToday && currentMinutes >= startMin && currentMinutes < endMin;
+
+                                return `<span class="time-slot on ${isCurrent ? 'current' : ''}">⚡ ${slot.start} - ${slot.end}</span>`;
+                            }).join('')}
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // Initialize and update every second
+        // Initialize
         updateStatus();
         displaySchedule();
+        calculateDailyStats();
         setInterval(updateStatus, 1000);
 
         // Hamburger menu scroll behavior
@@ -853,24 +1513,23 @@
 
         window.addEventListener('scroll', function() {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            // If at top of page, always show hamburger
+
             if (scrollTop <= 10) {
                 hamburger.classList.remove('hidden');
-            } 
-            // If scrolling down, hide hamburger
-            else if (scrollTop > lastScrollTop) {
+            } else if (scrollTop > lastScrollTop) {
                 hamburger.classList.add('hidden');
-            } 
-            // If scrolling up, show hamburger
-            else {
+            } else {
                 hamburger.classList.remove('hidden');
             }
-            
+
             lastScrollTop = scrollTop;
         });
 
-        // Menu functions
+        // Remove pulse after first click
+        hamburger.addEventListener('click', function() {
+            this.classList.remove('pulse');
+        });
+
         function toggleMenu() {
             const menu = document.getElementById('menu');
             const hamburger = document.getElementById('hamburger');
@@ -879,28 +1538,108 @@
         }
 
         function showPage(pageName) {
-            // Hide all pages
             document.getElementById('schedulePage').classList.remove('active');
             document.getElementById('contactsPage').classList.remove('active');
-            
-            // Show selected page
+
             if (pageName === 'schedule') {
                 document.getElementById('schedulePage').classList.add('active');
             } else if (pageName === 'contacts') {
                 document.getElementById('contactsPage').classList.add('active');
             }
-            
-            // Update active menu item
+
             const menuItems = document.querySelectorAll('.menu-item');
             menuItems.forEach(item => item.classList.remove('active-page'));
             event.target.classList.add('active-page');
-            
-            // Close menu
+
             toggleMenu();
-            
-            // Scroll to top of new page
             window.scrollTo(0, 0);
         }
+
+        // Touch swipe for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 100;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                const schedulePage = document.getElementById('schedulePage');
+                const contactsPage = document.getElementById('contactsPage');
+
+                if (diff > 0 && schedulePage.classList.contains('active')) {
+                    // Swipe left - go to contacts
+                    showPageDirect('contacts');
+                } else if (diff < 0 && contactsPage.classList.contains('active')) {
+                    // Swipe right - go to schedule
+                    showPageDirect('schedule');
+                }
+            }
+        }
+
+        function showPageDirect(pageName) {
+            document.getElementById('schedulePage').classList.remove('active');
+            document.getElementById('contactsPage').classList.remove('active');
+
+            if (pageName === 'schedule') {
+                document.getElementById('schedulePage').classList.add('active');
+            } else if (pageName === 'contacts') {
+                document.getElementById('contactsPage').classList.add('active');
+            }
+
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach((item, idx) => {
+                item.classList.remove('active-page');
+                if ((pageName === 'schedule' && idx === 0) || (pageName === 'contacts' && idx === 1)) {
+                    item.classList.add('active-page');
+                }
+            });
+        }
+
+        // Pull to refresh for mobile
+        let touchStartY = 0;
+        let pullDistance = 0;
+        const pullIndicator = document.getElementById('pullIndicator');
+
+        document.addEventListener('touchstart', e => {
+            if (window.pageYOffset === 0) {
+                touchStartY = e.touches[0].clientY;
+            }
+        });
+
+        document.addEventListener('touchmove', e => {
+            if (touchStartY > 0) {
+                pullDistance = e.touches[0].clientY - touchStartY;
+                if (pullDistance > 0 && pullDistance < 100) {
+                    pullIndicator.textContent = '↓ Pull to refresh';
+                    pullIndicator.classList.add('show');
+                } else if (pullDistance >= 100) {
+                    pullIndicator.textContent = '↻ Release to refresh';
+                }
+            }
+        });
+
+        document.addEventListener('touchend', e => {
+            if (pullDistance >= 100) {
+                pullIndicator.textContent = '⟳ Refreshing...';
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            } else {
+                pullIndicator.classList.remove('show');
+            }
+            touchStartY = 0;
+            pullDistance = 0;
+        });
     </script>
 </body>
 </html>
