@@ -25,7 +25,6 @@
             overflow-x: hidden;
         }
 
-        /* Animated Background */
         .animated-bg {
             position: fixed;
             top: 0;
@@ -156,28 +155,6 @@
             border-top: 6px solid rgba(26, 239, 177, 0.95);
         }
 
-        .hamburger:hover .hamburger-tooltip {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .hamburger-tooltip {
-            position: absolute;
-            top: -35px;
-            right: 0;
-            background: rgba(0, 0, 0, 0.85);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.85em;
-            font-weight: 500;
-            white-space: nowrap;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-            pointer-events: none;
-        }
-
         .hamburger.hidden {
             opacity: 0;
             transform: translateY(-20px);
@@ -237,7 +214,6 @@
             transform: translateY(-20px);
         }
 
-        /* Ripple Effect */
         .ripple {
             position: absolute;
             border-radius: 50%;
@@ -367,7 +343,6 @@
                         inset 0 1px 0 rgba(26, 239, 177, 0.3);
         }
 
-        /* Glow effects */
         .status-card.status-on::before {
             content: '';
             position: absolute;
@@ -466,7 +441,6 @@
             font-weight: 400;
         }
 
-        /* Quick Stats Card */
         .quick-stats {
             background: rgba(13, 77, 78, 0.6);
             backdrop-filter: blur(25px);
@@ -505,7 +479,6 @@
             font-weight: 500;
         }
 
-        /* Timeline */
         .timeline-card {
             background: rgba(13, 77, 78, 0.6);
             backdrop-filter: blur(25px);
@@ -538,13 +511,14 @@
             height: 80px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .timeline-slots {
             display: flex;
             height: 100%;
             position: relative;
+            border-radius: 15px;
         }
 
         .timeline-slot {
@@ -557,6 +531,7 @@
             font-size: 0.85em;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
         }
 
         .timeline-slot.on {
@@ -565,6 +540,53 @@
 
         .timeline-slot.off {
             background: linear-gradient(135deg, rgba(238, 9, 121, 0.4), rgba(255, 106, 0, 0.4));
+        }
+
+        .timeline-slot.first-slot {
+            border-top-left-radius: 15px;
+            border-bottom-left-radius: 15px;
+        }
+
+        .timeline-slot.last-slot {
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+
+        .timeline-slot-tooltip {
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 239, 177, 0.95);
+            color: #0a4d4e;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-slot-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid rgba(26, 239, 177, 0.95);
+        }
+
+        .timeline-slot:hover .timeline-slot-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
         }
 
         .timeline-marker {
@@ -576,6 +598,7 @@
             box-shadow: 0 0 10px rgba(26, 239, 177, 0.8);
             z-index: 10;
             animation: marker-pulse 1.5s ease-in-out infinite;
+            pointer-events: none;
         }
 
         @keyframes marker-pulse {
@@ -634,7 +657,6 @@
                         inset 0 1px 0 rgba(26, 239, 177, 0.3);
         }
 
-        /* Progress Ring */
         .progress-ring {
             margin: 20px auto;
             position: relative;
@@ -920,7 +942,6 @@
             transform: scale(1.02);
         }
 
-        /* Pull to refresh indicator */
         .pull-indicator {
             position: fixed;
             top: -60px;
@@ -977,20 +998,17 @@
     </style>
 </head>
 <body>
-    <!-- Animated Background -->
     <div class="animated-bg">
         <div class="bg-gradient"></div>
         <div class="particles" id="particles"></div>
     </div>
 
-    <!-- Pull to refresh indicator -->
     <div class="pull-indicator" id="pullIndicator">↓ Pull to refresh</div>
 
     <div class="hamburger" id="hamburger" onclick="toggleMenu()">
         <span class="hamburger-icon">⚡</span>
         <span class="hamburger-close"></span>
         <span class="hamburger-label" id="hamburgerLabel">Menu →</span>
-        <span class="hamburger-tooltip">Menu</span>
     </div>
 
     <div class="menu" id="menu">
@@ -1007,18 +1025,7 @@
             <p class="time-display" id="timeDisplay"></p>
         </div>
 
-        <div class="quick-stats card-enter" id="quickStats" style="animation-delay: 0.1s">
-            <div class="stat-item">
-                <div class="stat-value" id="totalOnHours">0</div>
-                <div class="stat-label">Hours ON Today</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="totalOffHours">0</div>
-                <div class="stat-label">Hours OFF Today</div>
-            </div>
-        </div>
-
-        <div class="countdown-card card-enter" id="countdownCard" style="animation-delay: 0.2s">
+        <div class="countdown-card card-enter" id="countdownCard" style="animation-delay: 0.1s">
             <div class="countdown-header" id="countdownHeader">Next Change</div>
 
             <svg class="progress-ring" viewBox="0 0 200 200">
@@ -1043,13 +1050,24 @@
             </svg>
         </div>
 
-        <div class="timeline-card card-enter" id="timelineCard" style="animation-delay: 0.3s">
+        <div class="timeline-card card-enter" id="timelineCard" style="animation-delay: 0.2s">
             <div class="timeline-header">
                 <h3>⏰ Today's Timeline</h3>
             </div>
             <div class="timeline-container">
                 <div class="timeline-slots" id="timelineSlots"></div>
                 <div class="timeline-marker" id="timelineMarker"></div>
+            </div>
+        </div>
+
+        <div class="quick-stats card-enter" id="quickStats" style="animation-delay: 0.3s">
+            <div class="stat-item">
+                <div class="stat-value" id="totalOnHours">0</div>
+                <div class="stat-label">Hours ON Today</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalOffHours">0</div>
+                <div class="stat-label">Hours OFF Today</div>
             </div>
         </div>
 
@@ -1082,7 +1100,7 @@
                             <div class="contact-name">Lineman</div>
                             <div class="contact-title">Power Supply Officer</div>
                         </div>
-                        <a href="tel:+9.1e+11" class="call-button">
+                        <a href="tel:+910000000000" class="call-button">
                             📞 Call
                         </a>
                     </div>
@@ -1093,7 +1111,7 @@
                             <div class="contact-name">Electricity Inspector</div>
                             <div class="contact-title">Field Inspector</div>
                         </div>
-                        <a href="tel:+9.1e+11" class="call-button">
+                        <a href="tel:+910000000000" class="call-button">
                             📞 Call
                         </a>
                     </div>
@@ -1110,7 +1128,6 @@
     <script>
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-        // Actual electricity schedule
         const schedule = {
             Monday: [
                 {start: '00:00', end: '07:00', status: 'ON'},
@@ -1156,7 +1173,6 @@
             ]
         };
 
-        // First-time visitor detection
         let isFirstVisit = !localStorage.getItem('visited');
         if (isFirstVisit) {
             localStorage.setItem('visited', 'true');
@@ -1171,7 +1187,6 @@
             }, 5000);
         }
 
-        // Create particles
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             for (let i = 0; i < 15; i++) {
@@ -1188,7 +1203,6 @@
 
         createParticles();
 
-        // Ripple effect
         function createRipple(event) {
             const button = event.currentTarget;
             const ripple = document.createElement('span');
@@ -1208,7 +1222,6 @@
             setTimeout(() => ripple.remove(), 600);
         }
 
-        // Add ripple to buttons
         document.querySelectorAll('.menu-item, .call-button').forEach(btn => {
             btn.addEventListener('click', createRipple);
         });
@@ -1265,7 +1278,6 @@
 
             let allSlots = [];
 
-            // Create all slots for the day
             for (let i = 0; i < todaySchedule.length; i++) {
                 const onSlot = todaySchedule[i];
                 const onStart = timeToMinutes(onSlot.start);
@@ -1277,7 +1289,6 @@
                     status: 'ON'
                 });
 
-                // Add OFF slot if there's a gap
                 if (i < todaySchedule.length - 1) {
                     const nextOnSlot = todaySchedule[i + 1];
                     const nextOnStart = timeToMinutes(nextOnSlot.start);
@@ -1292,10 +1303,8 @@
                 }
             }
 
-            // Sort slots
             allSlots.sort((a, b) => a.start - b.start);
 
-            // Add initial OFF slot if day doesn't start at 00:00
             if (allSlots[0].start > 0) {
                 allSlots.unshift({
                     start: 0,
@@ -1304,7 +1313,6 @@
                 });
             }
 
-            // Add final OFF slot if day doesn't end at 23:59
             const lastSlot = allSlots[allSlots.length - 1];
             if (lastSlot.end < 1439) {
                 allSlots.push({
@@ -1314,23 +1322,64 @@
                 });
             }
 
-            // Render slots
-            allSlots.forEach(slot => {
+            allSlots.forEach((slot, index) => {
                 const duration = slot.end - slot.start;
                 const percentage = (duration / 1440) * 100;
 
                 const slotDiv = document.createElement('div');
                 slotDiv.className = `timeline-slot ${slot.status.toLowerCase()}`;
+                if (index === 0) slotDiv.classList.add('first-slot');
+                if (index === allSlots.length - 1) slotDiv.classList.add('last-slot');
                 slotDiv.style.width = percentage + '%';
 
                 const startHour = Math.floor(slot.start / 60);
+                const startMin = slot.start % 60;
                 const endHour = Math.floor(slot.end / 60);
+                const endMin = slot.end % 60;
+
+                const startTime = `${startHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')}`;
+                const endTime = `${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`;
+
                 slotDiv.textContent = `${startHour}:00`;
 
+                const tooltip = document.createElement('div');
+                tooltip.className = 'timeline-slot-tooltip';
+                const icon = slot.status === 'ON' ? '⚡' : '🔌';
+                tooltip.textContent = `${icon} ${startTime} - ${endTime} ${slot.status}`;
+
+                slotDiv.appendChild(tooltip);
                 container.appendChild(slotDiv);
+
+                slotDiv.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const allTooltips = document.querySelectorAll('.timeline-slot-tooltip');
+                    allTooltips.forEach(t => {
+                        if (t !== tooltip) {
+                            t.style.opacity = '0';
+                            t.style.transform = 'translateX(-50%) translateY(0)';
+                        }
+                    });
+
+                    if (tooltip.style.opacity === '1') {
+                        tooltip.style.opacity = '0';
+                        tooltip.style.transform = 'translateX(-50%) translateY(0)';
+                    } else {
+                        tooltip.style.opacity = '1';
+                        tooltip.style.transform = 'translateX(-50%) translateY(-5px)';
+                    }
+                });
             });
 
-            // Position marker
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.timeline-slot')) {
+                    const allTooltips = document.querySelectorAll('.timeline-slot-tooltip');
+                    allTooltips.forEach(t => {
+                        t.style.opacity = '0';
+                        t.style.transform = 'translateX(-50%) translateY(0)';
+                    });
+                }
+            });
+
             const marker = document.getElementById('timelineMarker');
             const currentPercentage = (currentMinutes / 1440) * 100;
             marker.style.left = currentPercentage + '%';
@@ -1388,15 +1437,12 @@
             let startMinutes = 0;
 
             if (isOn) {
-                // Find current ON slot
                 for (let slot of todaySchedule) {
                     startMinutes = timeToMinutes(slot.start);
                     const endMinutes = timeToMinutes(slot.end);
 
                     if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
-                        // Check if this slot ends at 23:59 and tomorrow starts at 00:00
                         if (slot.end === '23:59' && tomorrowSchedule.length > 0 && tomorrowSchedule[0].start === '00:00') {
-                            // Power continues to tomorrow, find tomorrow's actual end time
                             nextChangeMinutes = timeToMinutes(tomorrowSchedule[0].end) + 24 * 60;
                             totalDuration = (24 * 60 - startMinutes) + timeToMinutes(tomorrowSchedule[0].end);
                         } else {
@@ -1407,13 +1453,11 @@
                     }
                 }
             } else {
-                // Find next ON slot
                 for (let slot of todaySchedule) {
                     const slotStartMinutes = timeToMinutes(slot.start);
                     if (currentMinutes < slotStartMinutes) {
                         nextChangeMinutes = slotStartMinutes;
 
-                        // Find duration of OFF period
                         let prevEnd = 0;
                         for (let s of todaySchedule) {
                             const sEnd = timeToMinutes(s.end);
@@ -1426,11 +1470,9 @@
                     }
                 }
 
-                // If no change found today, check tomorrow
                 if (!nextChangeMinutes && tomorrowSchedule.length > 0) {
                     nextChangeMinutes = timeToMinutes(tomorrowSchedule[0].start) + 24 * 60;
 
-                    // Find when power went OFF today
                     let lastOnEnd = 0;
                     for (let s of todaySchedule) {
                         const sEnd = timeToMinutes(s.end);
@@ -1446,7 +1488,6 @@
                 let minutesRemaining = nextChangeMinutes - currentMinutes;
                 if (minutesRemaining < 0) minutesRemaining += 24 * 60;
 
-                // Update progress ring
                 const circumference = 565.48;
                 const progress = 1 - (minutesRemaining / totalDuration);
                 const offset = circumference * (1 - progress);
@@ -1501,13 +1542,11 @@
             }).join('');
         }
 
-        // Initialize
         updateStatus();
         displaySchedule();
         calculateDailyStats();
         setInterval(updateStatus, 1000);
 
-        // Hamburger menu scroll behavior
         let lastScrollTop = 0;
         const hamburger = document.getElementById('hamburger');
 
@@ -1525,7 +1564,6 @@
             lastScrollTop = scrollTop;
         });
 
-        // Remove pulse after first click
         hamburger.addEventListener('click', function() {
             this.classList.remove('pulse');
         });
@@ -1555,7 +1593,6 @@
             window.scrollTo(0, 0);
         }
 
-        // Touch swipe for mobile
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -1577,10 +1614,8 @@
                 const contactsPage = document.getElementById('contactsPage');
 
                 if (diff > 0 && schedulePage.classList.contains('active')) {
-                    // Swipe left - go to contacts
                     showPageDirect('contacts');
                 } else if (diff < 0 && contactsPage.classList.contains('active')) {
-                    // Swipe right - go to schedule
                     showPageDirect('schedule');
                 }
             }
@@ -1605,7 +1640,6 @@
             });
         }
 
-        // Pull to refresh for mobile
         let touchStartY = 0;
         let pullDistance = 0;
         const pullIndicator = document.getElementById('pullIndicator');
