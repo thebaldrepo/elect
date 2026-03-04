@@ -3047,17 +3047,36 @@
 
     // ── PWA: Install prompt (Add to Home Screen) ──
     let deferredInstallPrompt = null;
-    const installBanner = document.getElementById('installBanner');
-    const installBtn    = document.getElementById('installBtn');
-    const installDismiss= document.getElementById('installDismiss');
+    const installBanner  = document.getElementById('installBanner');
+    const installBtn     = document.getElementById('installBtn');
+    const installDismiss = document.getElementById('installDismiss');
+
+    // If already running as installed PWA, permanently mark as dismissed
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+
+    if (isStandalone) {
+        localStorage.setItem('installDismissed', '1');
+        if (installBanner) installBanner.style.display = 'none';
+    }
 
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredInstallPrompt = e;
-        // Only show if not dismissed before
-        if (!localStorage.getItem('installDismissed')) {
+        // Never show if installed or previously dismissed
+        const dismissed  = localStorage.getItem('installDismissed');
+        const standalone = window.matchMedia('(display-mode: standalone)').matches
+            || window.navigator.standalone === true;
+        if (!dismissed && !standalone) {
             installBanner.classList.add('show');
         }
+    });
+
+    // When successfully installed, hide banner and mark dismissed
+    window.addEventListener('appinstalled', () => {
+        if (installBanner) installBanner.classList.remove('show');
+        localStorage.setItem('installDismissed', '1');
+        deferredInstallPrompt = null;
     });
 
     if (installBtn) {
@@ -3065,7 +3084,10 @@
             if (!deferredInstallPrompt) return;
             deferredInstallPrompt.prompt();
             const { outcome } = await deferredInstallPrompt.userChoice;
-            if (outcome === 'accepted') installBanner.classList.remove('show');
+            if (outcome === 'accepted') {
+                installBanner.classList.remove('show');
+                localStorage.setItem('installDismissed', '1');
+            }
             deferredInstallPrompt = null;
         });
     }
@@ -3075,11 +3097,6 @@
             installBanner.classList.remove('show');
             localStorage.setItem('installDismissed', '1');
         });
-    }
-
-    // Hide banner if already installed (standalone mode)
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        if (installBanner) installBanner.style.display = 'none';
     }
 
 </script>
