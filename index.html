@@ -1844,9 +1844,12 @@
         // RTL direction
         document.body.dir = isUrdu ? 'rtl' : 'ltr';
 
-        // Language label always shows the currently active language
+        // Language label shows what you'd switch TO, toggle ON = currently Urdu
         const langLabel = document.getElementById('lblUrdu');
-        if (langLabel) langLabel.textContent = isUrdu ? '🌐 اردو' : '🌐 English';
+        if (langLabel) langLabel.textContent = isUrdu ? '🌐 English' : '🌐 اردو';
+
+        // Swap all static labelled elements
+        const ids = ['navSchedule','navContacts','lblPreferences','lblNotif','lblSound',
                      'lblDark','shareBtnTxt','countdownEyebrow','statsEyebrow',
                      'statNameOn','statNameOff','timelineEyebrow','legendOn','legendOff',
                      'tlHintTxt','scheduleTitle','footerTxt','footerTxt2','csTitleTxt',
@@ -1986,11 +1989,14 @@
         const banner  = document.getElementById('updateBanner');
         const install = document.getElementById('installBanner');
         if (!banner) return;
+
+        // If update is showing, app is already installed — kill install banner permanently
+        localStorage.setItem('installDismissed', '1');
+        if (install) { install.classList.remove('show'); install.style.display = 'none'; }
+
         banner.classList.add('show');
-        if (install) install.classList.add('shift');
 
         document.getElementById('updateBtn').onclick = () => {
-            // Clear caches and reload to get fresh files
             if ('caches' in window) {
                 caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
                     .then(() => window.location.reload());
@@ -2001,7 +2007,6 @@
 
         document.getElementById('updateDismiss').onclick = () => {
             banner.classList.remove('show');
-            if (install) install.classList.remove('shift');
         };
     }
 
@@ -2985,7 +2990,7 @@
     // Ramadan init handled inside loadScheduleData().then() above
 
     // ── PWA: Service Worker registration + update detection ──
-    const SW_VERSION = 'tapper-v4'; // must match CACHE in sw.js
+    const SW_VERSION = 'tapper-v7'; // must match CACHE in sw.js
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -3032,8 +3037,12 @@
         const banner  = document.getElementById('updateBanner');
         const install = document.getElementById('installBanner');
         if (!banner) return;
+
+        // App is already installed if an update is available — kill install banner permanently
+        localStorage.setItem('installDismissed', '1');
+        if (install) { install.classList.remove('show'); install.style.display = 'none'; }
+
         banner.classList.add('show');
-        if (install) install.classList.add('shift');
 
         document.getElementById('updateBtn').onclick = () => {
             banner.classList.remove('show');
@@ -3042,7 +3051,6 @@
 
         document.getElementById('updateDismiss').onclick = () => {
             banner.classList.remove('show');
-            if (install) install.classList.remove('shift');
         };
     }
 
