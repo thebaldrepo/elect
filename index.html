@@ -1383,6 +1383,38 @@
             40%            { transform: scale(1.5); opacity: 1;   }
         }
 
+        /* ── Share Nudge Banner ── */
+        .share-nudge-banner {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 480px;
+            background: var(--on);
+            color: #fff;
+            border-radius: 16px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 32px rgba(26,107,74,0.35);
+            z-index: 998;
+            transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .share-nudge-banner.show { bottom: 24px; }
+        .share-nudge-banner .update-banner-title { color: #fff; }
+        .share-nudge-banner .update-banner-sub   { color: rgba(255,255,255,0.75); }
+        .share-nudge-banner .install-btn-add {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.35);
+        }
+        .share-nudge-banner .install-btn-dismiss {
+            color: rgba(255,255,255,0.7);
+            border-color: rgba(255,255,255,0.25);
+        }
+
         /* ── Update Banner ── */
         .update-banner {
             position: fixed;
@@ -1463,8 +1495,8 @@
         <div class="topbar-title">Tapper <span>/ Electricity</span></div>
     </div>
     <nav class="topbar-nav">
-        <button class="nav-btn active" onclick="showPage('schedule', this)">Schedule</button>
-        <button class="nav-btn" onclick="showPage('contacts', this)">Contacts</button>
+        <button class="nav-btn active" onclick="showPage('schedule', this)" id="navSchedule">Schedule</button>
+        <button class="nav-btn" onclick="showPage('contacts', this)" id="navContacts">Contacts</button>
         <button class="nav-btn" onclick="openSettings()">⚙</button>
     </nav>
 
@@ -1483,18 +1515,22 @@
 <!-- Settings panel -->
 <div class="settings-panel" id="settingsPanel">
     <button class="settings-close" onclick="closeSettings()">✕</button>
-    <div class="settings-section-title">Preferences</div>
+    <div class="settings-section-title" id="lblPreferences">Preferences</div>
     <div class="settings-item">
-        <span class="settings-label">🔔 Notifications</span>
+        <span class="settings-label" id="lblNotif">🔔 Notifications</span>
         <div class="toggle" id="notifToggle" onclick="toggleNotif()"></div>
     </div>
     <div class="settings-item">
-        <span class="settings-label">🔊 Sound Alerts</span>
+        <span class="settings-label" id="lblSound">🔊 Sound Alerts</span>
         <div class="toggle" id="soundToggle" onclick="toggleSound()"></div>
     </div>
     <div class="settings-item">
-        <span class="settings-label">🌙 Dark Mode</span>
+        <span class="settings-label" id="lblDark">🌙 Dark Mode</span>
         <div class="toggle" id="darkToggle" onclick="toggleDark()"></div>
+    </div>
+    <div class="settings-item">
+        <span class="settings-label" id="lblUrdu">🌐 اردو</span>
+        <div class="toggle" id="urduToggle" onclick="toggleUrdu()"></div>
     </div>
 </div>
 
@@ -1569,7 +1605,7 @@
                 <div class="status-headline" id="statusHeadline">Loading</div>
                 <div class="status-sub" id="statusSub">Fetching schedule data</div>
                 <div class="status-time" id="statusTime"></div>
-                <button class="share-btn" onclick="shareStatus()">↑ Share Status</button>
+                <button class="share-btn" onclick="shareStatus()" id="shareBtnTxt">↑ Share Status</button>
             </div>
         </div>
 
@@ -1603,15 +1639,15 @@
             </div>
 
             <div class="card stats-card">
-                <div class="card-eyebrow">Today</div>
+                <div class="card-eyebrow" id="statsEyebrow">Today</div>
                 <div class="stats-row">
                     <div class="stat-item">
                         <div class="stat-val" id="hoursOn">—</div>
-                        <div class="stat-name">hrs ON</div>
+                        <div class="stat-name" id="statNameOn">hrs ON</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-val" id="hoursOff">—</div>
-                        <div class="stat-name">hrs OFF</div>
+                        <div class="stat-name" id="statNameOff">hrs OFF</div>
                     </div>
                 </div>
             </div>
@@ -1619,17 +1655,17 @@
 
         <!-- Timeline -->
         <div class="card timeline-card">
-            <div class="card-eyebrow">Today's Timeline</div>
+            <div class="card-eyebrow" id="timelineEyebrow">Today's Timeline</div>
 
             <!-- Legend -->
             <div class="tl-legend">
                 <div class="tl-legend-item">
                     <div class="tl-legend-dot on"></div>
-                    <span>Power ON</span>
+                    <span id="legendOn">Power ON</span>
                 </div>
                 <div class="tl-legend-item">
                     <div class="tl-legend-dot off"></div>
-                    <span>Power OFF</span>
+                    <span id="legendOff">Power OFF</span>
                 </div>
             </div>
 
@@ -1648,19 +1684,19 @@
 
             <!-- Hint -->
             <div class="tl-hint" id="tlHint">
-                <span>👆</span> Tap a block to see its time
+                <span>👆</span> <span id="tlHintTxt">Tap a block to see its time</span>
             </div>
         </div>
 
         <!-- Weekly schedule -->
         <div class="card schedule-card">
-            <div class="schedule-title">Weekly Schedule</div>
+            <div class="schedule-title" id="scheduleTitle">Weekly Schedule</div>
             <div id="scheduleDisplay"></div>
             <button class="toggle-all-btn" id="toggleAllBtn" onclick="toggleAllDays()">Show all days ↓</button>
         </div>
 
         <div class="page-footer">
-            Put together by T & W — use it, share it, hope it helps. 🙂
+            <span id="footerTxt">Put together by T & W — use it, share it, hope it helps. 🙂</span>
         </div>
     </div>
 </div>
@@ -1670,8 +1706,8 @@
     <div class="content">
         <div class="card coming-soon-card">
             <div class="cs-icon">📋</div>
-            <div class="cs-title">Coming Soon</div>
-            <div class="cs-sub">Contact details for the local lineman and electricity inspector will be added here shortly.</div>
+            <div class="cs-title" id="csTitleTxt">Coming Soon</div>
+            <div class="cs-sub" id="csSubTxt">Contact details for the local lineman and electricity inspector will be added here shortly.</div>
             <div class="cs-dots">
                 <span></span><span></span><span></span>
             </div>
@@ -1681,7 +1717,7 @@
                 <div class="contact-avatar">👤</div>
                 <div class="contact-info">
                     <div class="contact-name">Lineman</div>
-                    <div class="contact-role">Power Supply Officer</div>
+                    <div class="contact-role" id="roleLineman">Power Supply Officer</div>
                 </div>
                 <a href="tel:+910000000000" class="call-btn">📞 Call</a>
             </div>
@@ -1689,12 +1725,12 @@
                 <div class="contact-avatar">👤</div>
                 <div class="contact-info">
                     <div class="contact-name">Electricity Inspector</div>
-                    <div class="contact-role">Field Inspector</div>
+                    <div class="contact-role" id="roleInspector">Field Inspector</div>
                 </div>
                 <a href="tel:+910000000000" class="call-btn">📞 Call</a>
             </div>
         </div>
-        <div class="page-footer">Put together by T & W — use it, share it, hope it helps. 🙂</div>
+        <div class="page-footer"><span id="footerTxt2">Put together by T & W — use it, share it, hope it helps. 🙂</span></div>
     </div>
 </div>
 
@@ -1712,12 +1748,178 @@
         Sunday:    [{start:'00:00',end:'07:00'},{start:'09:00',end:'12:00'},{start:'15:00',end:'18:00'},{start:'20:00',end:'23:59'}]
     };
 
+    let urduEnabled  = localStorage.getItem('urduEnabled')  === 'true';
     let notifEnabled = localStorage.getItem('notifEnabled') === 'true';
     let soundEnabled = localStorage.getItem('soundEnabled') === 'true';
     let darkEnabled  = localStorage.getItem('darkEnabled')  === 'true';
 
-    // Apply dark mode immediately on load (before paint) to avoid flash
+    // Apply dark mode immediately on load to avoid flash
     if (darkEnabled) document.body.classList.add('dark');
+
+    // ── Translation map ──
+    const T = {
+        en: {
+            navSchedule:    'Schedule',
+            navContacts:    'Contacts',
+            lblPreferences: 'Preferences',
+            lblNotif:       '🔔 Notifications',
+            lblSound:       '🔊 Sound Alerts',
+            lblDark:        '🌙 Dark Mode',
+            lblUrdu:        '🌐 اردو',
+            shareBtnTxt:    '↑ Share Status',
+            countdownEyebrow: 'Next Change',
+            statsEyebrow:   'Today',
+            statNameOn:     'hrs ON',
+            statNameOff:    'hrs OFF',
+            timelineEyebrow:'Today\'s Timeline',
+            legendOn:       'Power ON',
+            legendOff:      'Power OFF',
+            tlHintTxt:      'Tap a block to see its time',
+            scheduleTitle:  'Weekly Schedule',
+            footerTxt:      'Put together by T & W — use it, share it, hope it helps. 🙂',
+            footerTxt2:     'Put together by T & W — use it, share it, hope it helps. 🙂',
+            csTitleTxt:     'Coming Soon',
+            csSubTxt:       'Contact details for the local lineman and electricity inspector will be added here shortly.',
+            roleLineman:    'Power Supply Officer',
+            roleInspector:  'Field Inspector',
+            statusActive:   'Currently Active',
+            statusInactive: 'Currently Inactive',
+            powerOn:        'Power is On',
+            powerOff:       'Power is Off',
+            powerOnSub:     'Electricity is available in Tapper',
+            powerOffSub:    'No power supply in Tapper right now',
+            countdownOn:    'until power goes off',
+            countdownOff:   'until electricity returns',
+            nudgeTitle:     'Finding this useful?',
+            nudgeSub:       'Share it with your neighbours',
+            toggleAllShow:  'Show all days ↓',
+            toggleAllHide:  'Show less ↑',
+        },
+        ur: {
+            navSchedule:    'شیڈول',
+            navContacts:    'رابطے',
+            lblPreferences: 'ترجیحات',
+            lblNotif:       '🔔 اطلاعات',
+            lblSound:       '🔊 آواز',
+            lblDark:        '🌙 ڈارک موڈ',
+            lblUrdu:        '🌐 English',
+            shareBtnTxt:    '↑ اسٹیٹس شیئر کریں',
+            countdownEyebrow: 'اگلی تبدیلی',
+            statsEyebrow:   'آج',
+            statNameOn:     'گھنٹے آن',
+            statNameOff:    'گھنٹے آف',
+            timelineEyebrow:'آج کا شیڈول',
+            legendOn:       'بجلی آن',
+            legendOff:      'بجلی آف',
+            tlHintTxt:      'وقت دیکھنے کے لیے بلاک دبائیں',
+            scheduleTitle:  'ہفتہ وار شیڈول',
+            footerTxt:      'T & W کی طرف سے — استعمال کریں، شیئر کریں۔ 🙂',
+            footerTxt2:     'T & W کی طرف سے — استعمال کریں، شیئر کریں۔ 🙂',
+            csTitleTxt:     'جلد آ رہا ہے',
+            csSubTxt:       'لائن مین اور الیکٹریسٹی انسپکٹر کی تفصیلات جلد شامل کی جائیں گی۔',
+            roleLineman:    'لائن مین',
+            roleInspector:  'فیلڈ انسپکٹر',
+            statusActive:   'بجلی موجود ہے',
+            statusInactive: 'بجلی نہیں ہے',
+            powerOn:        'بجلی آ گئی',
+            powerOff:       'بجلی چلی گئی',
+            powerOnSub:     'ٹیپر میں ابھی بجلی دستیاب ہے',
+            powerOffSub:    'ٹیپر میں ابھی بجلی نہیں ہے',
+            countdownOn:    'بجلی جانے میں',
+            countdownOff:   'بجلی آنے میں',
+            nudgeTitle:     'مفید لگا؟',
+            nudgeSub:       'اپنے پڑوسیوں کو بھی بھیجیں',
+            toggleAllShow:  'تمام دن دکھائیں ↓',
+            toggleAllHide:  'کم دکھائیں ↑',
+        }
+    };
+
+    function getLang() { return urduEnabled ? 'ur' : 'en'; }
+    function t(key) { return T[getLang()][key] || T.en[key] || ''; }
+
+    function applyLanguage() {
+        const lang = getLang();
+        const isUrdu = lang === 'ur';
+
+        // RTL direction
+        document.body.dir = isUrdu ? 'rtl' : 'ltr';
+
+        // Swap all static labelled elements
+        const ids = ['navSchedule','navContacts','lblPreferences','lblNotif','lblSound',
+                     'lblDark','lblUrdu','shareBtnTxt','countdownEyebrow','statsEyebrow',
+                     'statNameOn','statNameOff','timelineEyebrow','legendOn','legendOff',
+                     'tlHintTxt','scheduleTitle','footerTxt','footerTxt2','csTitleTxt',
+                     'csSubTxt','roleLineman','roleInspector','nudgeTitle','nudgeSub'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = t(id);
+        });
+
+        // Toggle all button
+        const tab = document.getElementById('toggleAllBtn');
+        if (tab) tab.textContent = tab.classList.contains('open')
+            ? t('toggleAllHide') : t('toggleAllShow');
+
+        // Dynamic status text (re-apply with current state)
+        const on = isOn();
+        const slbl = document.getElementById('statusLabel');
+        const shln = document.getElementById('statusHeadline');
+        const ssub = document.getElementById('statusSub');
+        const clbl = document.getElementById('countdownLabel');
+        if (slbl) slbl.textContent = on ? t('statusActive')   : t('statusInactive');
+        if (shln) shln.textContent = on ? t('powerOn')        : t('powerOff');
+        if (ssub) ssub.textContent = on ? t('powerOnSub')     : t('powerOffSub');
+        if (clbl) clbl.textContent = on ? t('countdownOn')    : t('countdownOff');
+    }
+
+    function toggleUrdu() {
+        urduEnabled = !urduEnabled;
+        localStorage.setItem('urduEnabled', urduEnabled);
+        document.getElementById('urduToggle').classList.toggle('on', urduEnabled);
+        applyLanguage();
+    }
+
+    // Apply on load
+    if (urduEnabled) applyLanguage();
+
+    // ── Share nudge — every 20 opens after the 5th ──
+    function checkShareNudge() {
+        let opens = parseInt(localStorage.getItem('appOpens') || '0') + 1;
+        localStorage.setItem('appOpens', opens);
+
+        const nudgeDismissed = localStorage.getItem('nudgeDismissed') === 'true';
+        if (nudgeDismissed) return;
+
+        // Show on 5th open and every 20 after that (5, 25, 45 ...)
+        if (opens === 5 || (opens > 5 && (opens - 5) % 20 === 0)) {
+            setTimeout(() => {
+                const banner = document.getElementById('shareNudgeBanner');
+                if (!banner) return;
+                banner.classList.add('show');
+
+                document.getElementById('nudgeShareBtn').onclick = async () => {
+                    banner.classList.remove('show');
+                    try {
+                        await navigator.share({
+                            title: 'Tapper Electricity Schedule',
+                            text: 'Check live electricity schedule for Tapper:',
+                            url: window.location.href
+                        });
+                    } catch(e) {}
+                };
+
+                document.getElementById('nudgeDismiss').onclick = () => {
+                    banner.classList.remove('show');
+                    localStorage.setItem('nudgeDismissed', 'true');
+                };
+
+                // Auto-hide after 8 seconds if not interacted with
+                setTimeout(() => banner.classList.remove('show'), 8000);
+            }, 3000); // wait 3s after page load before showing
+        }
+    }
+
+    checkShareNudge();
 
     // ── Ramadan Data — must be at top before any tick runs ──
     let ramadanData = {
@@ -1818,6 +2020,7 @@
         document.getElementById('notifToggle').classList.toggle('on', notifEnabled);
         document.getElementById('soundToggle').classList.toggle('on', soundEnabled);
         document.getElementById('darkToggle').classList.toggle('on', darkEnabled);
+        document.getElementById('urduToggle').classList.toggle('on', urduEnabled);
     }
 
     function toggleDark() {
@@ -1966,7 +2169,7 @@
             for (const s of todaySched) {
                 const slotStart = toMin(s.start);
                 const slotEnd   = toMin(s.end);
-                if (curMin >= slotStart && curMin < slotEnd) {
+                if (curMin >= slotStart && curMin <= slotEnd) {
                     const minsLeft = slotEnd - curMin;
                     // Fire when between 14 and 16 mins left (catches the minute reliably)
                     if (minsLeft <= 15 && minsLeft > 0 && power15SlotEnd !== s.end) {
@@ -2010,7 +2213,7 @@
         const now = new Date();
         const day = days[now.getDay()];
         const cur = now.getHours()*60 + now.getMinutes();
-        return schedule[day].some(s => cur >= toMin(s.start) && cur < toMin(s.end));
+        return schedule[day].some(s => cur >= toMin(s.start) && cur <= toMin(s.end));
     }
 
     // Page nav
@@ -2231,11 +2434,9 @@
         const card = document.getElementById('statusCard');
         card.className = 'card status-card ' + (on ? 'is-on' : 'is-off');
         document.getElementById('statusIcon').textContent = on ? '💡' : '🔌';
-        document.getElementById('statusLabel').textContent = on ? 'Currently Active' : 'Currently Inactive';
-        document.getElementById('statusHeadline').textContent = on ? 'Power is On' : 'Power is Off';
-        document.getElementById('statusSub').textContent = on
-            ? 'Electricity is available in Tapper'
-            : 'No power supply in Tapper right now';
+        document.getElementById('statusLabel').textContent    = on ? t('statusActive')  : t('statusInactive');
+        document.getElementById('statusHeadline').textContent = on ? t('powerOn')       : t('powerOff');
+        document.getElementById('statusSub').textContent      = on ? t('powerOnSub')    : t('powerOffSub');
         document.getElementById('statusTime').textContent = now.toLocaleString('en-US', {
             weekday:'long', hour:'2-digit', minute:'2-digit', second:'2-digit'
         });
@@ -2300,8 +2501,7 @@
         document.getElementById('countdownTime').textContent = timeStr;
         document.getElementById('countdownEyebrow').textContent = on ? 'Power off in' : 'Power on in';
         document.getElementById('countdownLabel').textContent = on
-            ? 'until next outage'
-            : 'until electricity returns';
+            ? t('countdownOn') : t('countdownOff');
     }
 
     function updateTimeline() {
@@ -2430,7 +2630,7 @@
             const isVisible = day === today || day === tom;
             if (!isVisible) row.classList.toggle('hidden-row', !expanded);
         });
-        document.getElementById('toggleAllBtn').textContent = expanded ? 'Show less ↑' : 'Show all days ↓';
+        document.getElementById('toggleAllBtn').textContent = expanded ? t('toggleAllHide') : t('toggleAllShow');
     }
 
     // Swipe navigation
@@ -2526,11 +2726,11 @@
 
         const on = isOn();
         dot.className    = 'pill-dot ' + (on ? 'on' : 'off');
-        text.textContent = on ? 'Power is On' : 'Power is Off';
+        text.textContent = on ? t('powerOn') : t('powerOff');
 
         const ctVal = document.getElementById('countdownTime').textContent;
         if (ctVal && ctVal !== '—') {
-            countdown.textContent = (on ? 'off in ' : 'on in ') + ctVal;
+            countdown.textContent = (on ? (urduEnabled ? 'آف ' : 'off in ') : (urduEnabled ? 'آن ' : 'on in ')) + ctVal;
         } else {
             countdown.textContent = '';
         }
@@ -2869,6 +3069,17 @@
     }
 
 </script>
+    <!-- Share nudge banner -->
+    <div class="share-nudge-banner" id="shareNudgeBanner">
+        <div class="update-banner-icon">🤝</div>
+        <div class="update-banner-text">
+            <div class="update-banner-title" id="nudgeTitle">Finding this useful?</div>
+            <div class="update-banner-sub" id="nudgeSub">Share Tapper with your neighbours</div>
+        </div>
+        <button class="install-btn-add" id="nudgeShareBtn">Share ↗</button>
+        <button class="install-btn-dismiss" id="nudgeDismiss">✕</button>
+    </div>
+
     <!-- Update banner -->
     <div class="update-banner" id="updateBanner">
         <div class="update-banner-icon">🔄</div>
