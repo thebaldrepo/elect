@@ -1802,7 +1802,7 @@
             lblNotif:       '🔔 اطلاعات',
             lblSound:       '🔊 آواز',
             lblDark:        '🌙 ڈارک موڈ',
-            lblUrdu:        '🌐 English',
+            lblUrdu:        '🌐 اردو',
             shareBtnTxt:    '↑ اسٹیٹس شیئر کریں',
             countdownEyebrow: 'اگلی تبدیلی',
             statsEyebrow:   'آج',
@@ -1844,9 +1844,10 @@
         // RTL direction
         document.body.dir = isUrdu ? 'rtl' : 'ltr';
 
-        // Swap all static labelled elements
-        const ids = ['navSchedule','navContacts','lblPreferences','lblNotif','lblSound',
-                     'lblDark','lblUrdu','shareBtnTxt','countdownEyebrow','statsEyebrow',
+        // Language label always shows the currently active language
+        const langLabel = document.getElementById('lblUrdu');
+        if (langLabel) langLabel.textContent = isUrdu ? '🌐 اردو' : '🌐 English';
+                     'lblDark','shareBtnTxt','countdownEyebrow','statsEyebrow',
                      'statNameOn','statNameOff','timelineEyebrow','legendOn','legendOff',
                      'tlHintTxt','scheduleTitle','footerTxt','footerTxt2','csTitleTxt',
                      'csSubTxt','roleLineman','roleInspector','nudgeTitle','nudgeSub'];
