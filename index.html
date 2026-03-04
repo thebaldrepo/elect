@@ -1967,15 +1967,13 @@
             if (data.schedule)    schedule    = data.schedule;
             if (data.ramadanData) ramadanData = data.ramadanData;
 
-            // ── Version check — show update banner if newer version available ──
+            // ── Version check — show update banner if schedule.json has a newer version ──
             if (data.version) {
                 const knownVersion = localStorage.getItem('appVersion');
-                if (knownVersion && knownVersion !== data.version) {
-                    // Newer version detected — show update banner
+                if (knownVersion !== null && knownVersion !== String(data.version)) {
                     showUpdateBannerDirect();
                 }
-                // Always save the latest version we've seen
-                localStorage.setItem('appVersion', data.version);
+                localStorage.setItem('appVersion', String(data.version));
             }
         } catch(e) {
             // Offline or fetch failed — built-in fallback data already in place
@@ -2986,12 +2984,19 @@
     // Ramadan init handled inside loadScheduleData().then() above
 
     // ── PWA: Service Worker registration + update detection ──
+    const SW_VERSION = 'tapper-v3'; // must match CACHE in sw.js
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').then(reg => {
 
-                // A new SW is already waiting (user opened app after update was cached)
-                if (reg.waiting) showUpdateBanner(reg.waiting);
+                // Check for update every time app opens (important for installed PWA)
+                reg.update();
+
+                // A new SW is already waiting — show banner immediately
+                if (reg.waiting) {
+                    showUpdateBanner(reg.waiting);
+                }
 
                 // A new SW just finished installing and is now waiting
                 reg.addEventListener('updatefound', () => {
@@ -3005,12 +3010,21 @@
 
             }).catch(() => {});
 
-            // When SW activates after SKIP_WAITING, reload the page
+            // When SW activates after SKIP_WAITING, reload to get fresh files
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
                 if (!refreshing) { refreshing = true; window.location.reload(); }
             });
         });
+
+        // Also check SW version in localStorage — catches cases where
+        // SW updated silently but banner was never shown
+        const lastSWVersion = localStorage.getItem('swVersion');
+        if (lastSWVersion && lastSWVersion !== SW_VERSION) {
+            // SW version changed — clear caches and reload
+            showUpdateBannerDirect();
+        }
+        localStorage.setItem('swVersion', SW_VERSION);
     }
 
     function showUpdateBanner(sw) {
