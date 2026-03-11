@@ -321,52 +321,99 @@
 
         /* ── Status Card ── */
         .status-card {
-            padding: 36px 32px;
-            display: flex;
-            align-items: center;
-            gap: 28px;
-            transition: border-color 0.4s ease, background 0.4s ease;
+            padding: 28px 28px 28px 28px;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.8s ease, border-color 0.6s ease, box-shadow 0.8s ease;
+            background: var(--surface);
+            border-color: var(--border);
+            min-height: 168px;
         }
 
+        /* ── Light flood — originates from bulb center (top-right area) ── */
+        .status-card .card-light {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            transition: opacity 0.9s ease;
+            opacity: 0;
+            z-index: 0;
+            background:
+                /* bright hot spot right at bulb */
+                radial-gradient(ellipse 55% 80% at 82% 55%,
+                    rgba(255,230,120,0.65)  0%,
+                    rgba(255,190,50,0.45)   25%,
+                    rgba(255,150,10,0.20)   55%,
+                    transparent             80%),
+                /* wider warm wash across whole card */
+                radial-gradient(ellipse 110% 120% at 90% 40%,
+                    rgba(255,180,40,0.30)   0%,
+                    rgba(255,130,10,0.14)   40%,
+                    rgba(255,80,0,0.05)     70%,
+                    transparent             90%);
+        }
+
+        .status-card.is-on  .card-light {
+            opacity: 1;
+            animation: lightFlicker 4s ease-in-out infinite;
+        }
+        .status-card.is-off .card-light { opacity: 0; }
+
+        @keyframes lightFlicker {
+            0%,100% { opacity: 1;   }
+            45%     { opacity: 0.82; }
+            50%     { opacity: 0.95; }
+            75%     { opacity: 0.78; }
+            80%     { opacity: 1;   }
+        }
+
+        /* Card border + shadow warmth */
         .status-card.is-on {
-            background: var(--on-bg);
-            border-color: var(--on-border);
+            border-color: rgba(255,170,20,0.35);
+            box-shadow: 0 0 0 1px rgba(255,170,20,0.15), var(--shadow);
         }
+        .status-card.is-off { border-color: var(--border); }
 
-        .status-card.is-off {
-            background: var(--off-bg);
-            border-color: var(--off-border);
-        }
-
-        .status-indicator {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
+        /* ── Bulb assembly — pinned to top-right, wire from card top edge ── */
+        .bulb-assembly {
+            position: absolute;
+            top: 0;
+            right: 46px;
+            width: 56px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            flex-shrink: 0;
-            transition: all 0.4s ease;
+            transform-origin: top center;
+            z-index: 3;
+            pointer-events: none;
         }
 
-        .is-on .status-indicator {
-            background: var(--on);
-            box-shadow: 0 0 0 8px rgba(26, 107, 74, 0.12);
-            animation: breathe 3s ease-in-out infinite;
+        .is-on  .bulb-assembly { animation: swing 5s ease-in-out infinite; }
+        .is-off .bulb-assembly { animation: swingSlow 8s ease-in-out infinite; }
+
+        @keyframes swing {
+            0%   { transform: rotate(0deg);    }
+            18%  { transform: rotate(4deg);    }
+            50%  { transform: rotate(-4deg);   }
+            80%  { transform: rotate(2.5deg);  }
+            100% { transform: rotate(0deg);    }
         }
 
-        .is-off .status-indicator {
-            background: var(--off);
-            box-shadow: 0 0 0 8px rgba(155, 35, 53, 0.1);
+        @keyframes swingSlow {
+            0%   { transform: rotate(0deg);  }
+            35%  { transform: rotate(1.8deg); }
+            65%  { transform: rotate(-1.8deg);}
+            100% { transform: rotate(0deg);  }
         }
 
-        @keyframes breathe {
-            0%, 100% { box-shadow: 0 0 0 8px rgba(26,107,74,0.12); }
-            50%       { box-shadow: 0 0 0 14px rgba(26,107,74,0.06); }
+        /* Layout */
+        .status-body {
+            flex: 1;
+            min-width: 0;
+            padding-right: 110px;
+            position: relative;
+            z-index: 1;
         }
-
-        .status-body { flex: 1; min-width: 0; }
 
         .status-label {
             font-family: 'DM Mono', monospace;
@@ -377,7 +424,7 @@
             margin-bottom: 6px;
         }
 
-        .is-on  .status-label { color: var(--on); }
+        .is-on  .status-label { color: #A86800; }
         .is-off .status-label { color: var(--off); }
 
         .status-headline {
@@ -911,8 +958,6 @@
         /* ── Responsive ── */
         @media (max-width: 560px) {
             .grid-2 { grid-template-columns: 1fr; }
-            .status-card { flex-direction: column; text-align: center; }
-            .status-indicator { width: 60px; height: 60px; font-size: 26px; }
             .status-headline { font-size: 1.6em; }
             .topbar-title span { display: none; }
             .content { padding: 20px 14px 48px; }
@@ -1599,7 +1644,86 @@
 
         <!-- Status -->
         <div class="card status-card" id="statusCard">
-            <div class="status-indicator" id="statusIcon">⚡</div>
+
+            <!-- Light flood layer — sits behind everything -->
+            <div class="card-light" id="cardLight"></div>
+
+            <!-- Hanging bulb assembly — wire attached to top edge -->
+            <div class="bulb-assembly" id="bulbAssembly">
+                <svg id="bulbSvg" width="56" height="140" viewBox="0 0 56 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- Glass gradient — gives sphere depth -->
+                        <radialGradient id="glassOff" cx="38%" cy="32%" r="60%">
+                            <stop offset="0%"   stop-color="#D8D0C4" stop-opacity="0.9"/>
+                            <stop offset="40%"  stop-color="#B8B0A4" stop-opacity="0.6"/>
+                            <stop offset="100%" stop-color="#888078" stop-opacity="0.3"/>
+                        </radialGradient>
+                        <radialGradient id="glassOn" cx="38%" cy="32%" r="60%">
+                            <stop offset="0%"   stop-color="#FFF0A0" stop-opacity="1"/>
+                            <stop offset="30%"  stop-color="#FFD050" stop-opacity="0.92"/>
+                            <stop offset="70%"  stop-color="#FF9010" stop-opacity="0.75"/>
+                            <stop offset="100%" stop-color="#C05000" stop-opacity="0.4"/>
+                        </radialGradient>
+                        <!-- Outer halo glow for ON state -->
+                        <radialGradient id="haloOn" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%"   stop-color="#FFD060" stop-opacity="0.5"/>
+                            <stop offset="60%"  stop-color="#FF9020" stop-opacity="0.2"/>
+                            <stop offset="100%" stop-color="#FF6000" stop-opacity="0"/>
+                        </radialGradient>
+                        <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+                            <feGaussianBlur stdDeviation="3.5" result="blur"/>
+                            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                        <filter id="softglow" x="-60%" y="-60%" width="220%" height="220%">
+                            <feGaussianBlur stdDeviation="6" result="blur"/>
+                            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Wire from top of card -->
+                    <line x1="28" y1="0" x2="28" y2="22" stroke="#706860" stroke-width="1.8" stroke-linecap="round"/>
+
+                    <!-- Screw base — top section (flat cap) -->
+                    <rect x="18" y="22" width="20" height="4" rx="2" fill="#8A8278"/>
+                    <!-- Screw threads — 4 rings -->
+                    <rect x="17" y="26" width="22" height="3.5" rx="1.5" fill="#706860"/>
+                    <rect x="17" y="30" width="22" height="3.5" rx="1.5" fill="#7A7268"/>
+                    <rect x="17" y="34" width="22" height="3.5" rx="1.5" fill="#706860"/>
+                    <rect x="17" y="38" width="22" height="3.5" rx="1.5" fill="#7A7268"/>
+                    <!-- Highlight on threads -->
+                    <rect x="17" y="26" width="5" height="15.5" rx="1" fill="white" fill-opacity="0.07"/>
+
+                    <!-- Neck — transition from base to globe -->
+                    <path d="M19 42 Q18 50 14 58 L42 58 Q38 50 37 42 Z" fill="#9A9288"/>
+                    <path d="M20 42 Q19 50 16 57 L19 57 Q21 50 22 42 Z" fill="white" fill-opacity="0.09"/>
+
+                    <!-- Outer halo (only visible when ON) -->
+                    <ellipse id="bulbHalo" cx="28" cy="95" rx="32" ry="34" fill="url(#haloOn)" opacity="0"/>
+
+                    <!-- Glass globe body -->
+                    <ellipse id="bulbGlass" cx="28" cy="95" rx="24" ry="26" fill="url(#glassOff)" stroke="#A09888" stroke-width="0.8"/>
+
+                    <!-- Filament leads (vertical wires inside) -->
+                    <line id="leadL" x1="22" y1="85" x2="22" y2="100" stroke="#C8A060" stroke-width="1" opacity="0.7"/>
+                    <line id="leadR" x1="34" y1="85" x2="34" y2="100" stroke="#C8A060" stroke-width="1" opacity="0.7"/>
+
+                    <!-- Filament — W shape -->
+                    <path id="filament"
+                        d="M22 100 L24 86 L28 94 L32 86 L34 100"
+                        stroke="#C8A060" stroke-width="1.4" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+
+                    <!-- Glass shine highlights — give it roundness -->
+                    <ellipse cx="20" cy="80" rx="5" ry="8" fill="white" fill-opacity="0.18" transform="rotate(-15 20 80)"/>
+                    <ellipse cx="16" cy="90" rx="2.5" ry="4" fill="white" fill-opacity="0.10" transform="rotate(-10 16 90)"/>
+                    <!-- Small bright specular dot -->
+                    <ellipse cx="18" cy="77" rx="2" ry="2.5" fill="white" fill-opacity="0.35"/>
+
+                    <!-- Bottom of globe — slightly darker -->
+                    <ellipse cx="28" cy="115" rx="16" ry="6" fill="#604030" fill-opacity="0.12"/>
+                </svg>
+            </div>
+
             <div class="status-body">
                 <div class="status-label" id="statusLabel">Checking…</div>
                 <div class="status-headline" id="statusHeadline">Loading</div>
@@ -2437,7 +2561,27 @@
         const on = isOn();
         const card = document.getElementById('statusCard');
         card.className = 'card status-card ' + (on ? 'is-on' : 'is-off');
-        document.getElementById('statusIcon').textContent = on ? '💡' : '🔌';
+
+        // ── Update SVG bulb appearance ──
+        const bulbGlass  = document.getElementById('bulbGlass');
+        const bulbHalo   = document.getElementById('bulbHalo');
+        const filament   = document.getElementById('filament');
+        const leadL      = document.getElementById('leadL');
+        const leadR      = document.getElementById('leadR');
+
+        if (on) {
+            if (bulbGlass) { bulbGlass.setAttribute('fill', 'url(#glassOn)'); bulbGlass.setAttribute('stroke', 'rgba(255,180,40,0.5)'); }
+            if (bulbHalo)  { bulbHalo.setAttribute('opacity', '1'); bulbHalo.style.animation = 'lightFlicker 4s ease-in-out infinite'; }
+            if (filament)  { filament.setAttribute('stroke', '#FFE060'); filament.setAttribute('stroke-width', '1.8'); filament.setAttribute('filter', 'url(#glow)'); }
+            if (leadL)     { leadL.setAttribute('stroke', '#FFD040'); leadL.setAttribute('opacity', '1'); }
+            if (leadR)     { leadR.setAttribute('stroke', '#FFD040'); leadR.setAttribute('opacity', '1'); }
+        } else {
+            if (bulbGlass) { bulbGlass.setAttribute('fill', 'url(#glassOff)'); bulbGlass.setAttribute('stroke', '#A09888'); }
+            if (bulbHalo)  { bulbHalo.setAttribute('opacity', '0'); bulbHalo.style.animation = ''; }
+            if (filament)  { filament.setAttribute('stroke', '#7A6040'); filament.setAttribute('stroke-width', '1.4'); filament.removeAttribute('filter'); }
+            if (leadL)     { leadL.setAttribute('stroke', '#C8A060'); leadL.setAttribute('opacity', '0.7'); }
+            if (leadR)     { leadR.setAttribute('stroke', '#C8A060'); leadR.setAttribute('opacity', '0.7'); }
+        }
         document.getElementById('statusLabel').textContent    = on ? t('statusActive')  : t('statusInactive');
         document.getElementById('statusHeadline').textContent = on ? t('powerOn')       : t('powerOff');
         document.getElementById('statusSub').textContent      = on ? t('powerOnSub')    : t('powerOffSub');
@@ -2990,7 +3134,7 @@
     // Ramadan init handled inside loadScheduleData().then() above
 
     // ── PWA: Service Worker registration + update detection ──
-    const SW_VERSION = 'tapper-v7'; // must match CACHE in sw.js
+    const SW_VERSION = 'tapper-v11'; // must match CACHE in sw.js
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
