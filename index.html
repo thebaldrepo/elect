@@ -1863,13 +1863,13 @@
 
     // ── Data — loaded from schedule.json, fallback to defaults ──
     let schedule = {
-        Monday:    [{start:'00:00',end:'07:00'},{start:'09:00',end:'12:00'},{start:'15:00',end:'18:00'},{start:'20:00',end:'23:59'}],
-        Tuesday:   [{start:'00:00',end:'09:00'},{start:'12:00',end:'15:00'},{start:'18:00',end:'20:00'},{start:'22:00',end:'23:59'}],
-        Wednesday: [{start:'00:00',end:'07:00'},{start:'09:00',end:'12:00'},{start:'15:00',end:'18:00'},{start:'20:00',end:'23:59'}],
-        Thursday:  [{start:'00:00',end:'09:00'},{start:'12:00',end:'15:00'},{start:'18:00',end:'20:00'},{start:'22:00',end:'23:59'}],
-        Friday:    [{start:'00:00',end:'07:00'},{start:'09:00',end:'12:00'},{start:'15:00',end:'18:00'},{start:'20:00',end:'23:59'}],
-        Saturday:  [{start:'00:00',end:'09:00'},{start:'12:00',end:'15:00'},{start:'18:00',end:'20:00'},{start:'22:00',end:'23:59'}],
-        Sunday:    [{start:'00:00',end:'07:00'},{start:'09:00',end:'12:00'},{start:'15:00',end:'18:00'},{start:'20:00',end:'23:59'}]
+        Monday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'12:00'},{start:'14:00',end:'16:00'},{start:'18:00',end:'23:59'}],
+        Tuesday:   [{start:'00:00',end:'10:00'},{start:'12:00',end:'14:00'},{start:'16:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+        Wednesday: [{start:'00:00',end:'08:00'},{start:'10:00',end:'12:00'},{start:'14:00',end:'16:00'},{start:'18:00',end:'23:59'}],
+        Thursday:  [{start:'00:00',end:'10:00'},{start:'12:00',end:'14:00'},{start:'16:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+        Friday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'12:00'},{start:'14:00',end:'16:00'},{start:'18:00',end:'23:59'}],
+        Saturday:  [{start:'00:00',end:'10:00'},{start:'12:00',end:'14:00'},{start:'16:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+        Sunday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'12:00'},{start:'14:00',end:'16:00'},{start:'18:00',end:'23:59'}]
     };
 
     let urduEnabled  = localStorage.getItem('urduEnabled')  === 'true';
@@ -3134,7 +3134,7 @@
     // Ramadan init handled inside loadScheduleData().then() above
 
     // ── PWA: Service Worker registration + update detection ──
-    const SW_VERSION = 'tapper-v11'; // must match CACHE in sw.js
+    const SW_VERSION = 'tapper-v12'; // must match CACHE in sw.js
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
