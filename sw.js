@@ -1,4 +1,4 @@
-const CACHE = 'tapper-v12';
+const CACHE = 'tapper-v14';
 
 const PRECACHE = [
     './index.html',

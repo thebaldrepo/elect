@@ -965,6 +965,9 @@
         }
 
         /* ── Ramadan Card ── */
+        /* Hidden by default — JS shows it only during Ramadan season */
+        #ramadanCard { display: none; }
+
         .ramadan-card {
             padding: 0;
             overflow: hidden;
@@ -1208,87 +1211,6 @@
         .rm-table-row span:not(:first-child) { text-align: center; font-family: 'DM Mono', monospace; }
         .rm-table-row.today-row span { color: var(--warn); }
         .rm-table-row.today-row .rm-date-col { color: var(--text); font-weight: 600; }
-
-
-        /* ── Eid Mubarak Pill ── */
-        .eid-pill-wrapper {
-            display: none;
-            padding: 6px;
-        }
-
-        .eid-pill-wrapper.show {
-            display: block;
-            animation: eidFadeIn 0.9s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes eidFadeIn {
-            from { opacity: 0; transform: scale(0.88); }
-            to   { opacity: 1; transform: scale(1); }
-        }
-
-        .eid-pill {
-            background: linear-gradient(135deg, #92600A 0%, #B45309 40%, #D97706 70%, #92600A 100%);
-            background-size: 200% 200%;
-            animation: eidShimmer 4s ease infinite;
-            border-radius: 100px;
-            padding: clamp(14px, 3vw, 22px) clamp(16px, 4vw, 32px);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 24px rgba(180, 83, 9, 0.3), 0 1px 4px rgba(0,0,0,0.1);
-        }
-
-        @keyframes eidShimmer {
-            0%   { background-position: 0% 50%; }
-            50%  { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .eid-pill::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -60%;
-            width: 50%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.12);
-            transform: skewX(-20deg);
-            animation: eidGloss 4s ease-in-out infinite;
-        }
-
-        @keyframes eidGloss {
-            0%, 100% { left: -60%; }
-            50%       { left: 120%; }
-        }
-
-        .eid-pill-main {
-            font-family: 'Fraunces', serif;
-            font-size: clamp(1em, 4vw, 1.6em);
-            font-weight: 600;
-            color: #fff;
-            letter-spacing: 0.5px;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.2);
-            margin-bottom: 4px;
-            white-space: nowrap;
-        }
-
-        .eid-pill-sub {
-            font-size: clamp(0.65em, 2.5vw, 0.78em);
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 400;
-            letter-spacing: 0.5px;
-        }
-
-        /* Ramadan card collapse transition */
-        .ramadan-card.eid-mode .rm-header,
-        .ramadan-card.eid-mode .rm-body,
-        .ramadan-card.eid-mode .rm-countdown-row,
-        .ramadan-card.eid-mode .rm-toggle-btn,
-        .ramadan-card.eid-mode .rm-schedule {
-            display: none;
-        }
-
-
         /* ── Install Banner ── */
         .install-banner {
             position: fixed;
@@ -1370,7 +1292,45 @@
             cursor: pointer;
         }
 
-        /* ── Coming Soon Card ── */
+        /* ── Sunrise / Sunset Widget ── */
+        .sun-card { padding: 20px 24px 16px; }
+
+        .sun-times {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            position: relative;
+            height: 80px;
+            margin-top: 8px;
+        }
+
+        .sun-time-block { display: flex; flex-direction: column; gap: 3px; z-index: 1; }
+        .sun-time-block.sunset { text-align: right; }
+
+        .sun-time-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62em;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-light);
+        }
+
+        .sun-time-val {
+            font-family: 'Fraunces', serif;
+            font-size: 1.25em;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.5px;
+        }
+
+        .sun-arc-wrap {
+            position: absolute;
+            left: 0; right: 0; top: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+                /* ── Coming Soon Card ── */
         .coming-soon-card {
             padding: 56px 32px;
             display: flex;
@@ -1632,14 +1592,6 @@
                 </div>
                 <div id="rmTableRows"></div>
             </div>
-
-            <!-- Eid Mubarak pill (shown after last Iftaar) -->
-            <div class="eid-pill-wrapper" id="eidPillWrapper">
-                <div class="eid-pill">
-                    <div class="eid-pill-main">🌙 عید مبارک · Eid Mubarak ✨</div>
-                    <div class="eid-pill-sub">From T &amp; W</div>
-                </div>
-            </div>
         </div>
 
         <!-- Status -->
@@ -1778,7 +1730,23 @@
         </div>
 
         <!-- Timeline -->
-        <div class="card timeline-card">
+        <!-- Sunrise / Sunset Widget -->
+        <div class="card sun-card" id="sunCard">
+            <div class="card-eyebrow">Sunrise &amp; Sunset</div>
+            <div class="sun-times" id="sunTimes">
+                <div class="sun-time-block sunrise">
+                    <div class="sun-time-label">Sunrise</div>
+                    <div class="sun-time-val" id="sunriseVal">—</div>
+                </div>
+                <div class="sun-arc-wrap" id="sunArcWrap"></div>
+                <div class="sun-time-block sunset">
+                    <div class="sun-time-label">Sunset</div>
+                    <div class="sun-time-val" id="sunsetVal">—</div>
+                </div>
+            </div>
+        </div>
+
+                <div class="card timeline-card">
             <div class="card-eyebrow" id="timelineEyebrow">Today's Timeline</div>
 
             <!-- Legend -->
@@ -2801,19 +2769,100 @@
     });
 
     // Init + tick
-    function tick() { updateStatus(); buildSchedule(); updateHeaderPill(); checkSmartAlerts(); }
+    // ── Sunrise / Sunset Widget ──
+    const SUN_LAT = 34.2065304;
+    const SUN_LNG = 74.5068355;
+    let sunriseMin = null;
+    let sunsetMin  = null;
+    let lastSunDate = '';
+
+    async function fetchSunTimes() {
+        const today = new Date();
+        const dateKey = today.toISOString().slice(0, 10);
+        if (dateKey === lastSunDate && sunriseMin !== null) return;
+        try {
+            // Use Open-Meteo — free, no key, excellent CORS support
+            const res  = await fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${SUN_LAT}&longitude=${SUN_LNG}&daily=sunrise,sunset&timezone=Asia%2FKolkata&forecast_days=1`
+            );
+            const data = await res.json();
+            if (!data.daily || !data.daily.sunrise) return;
+
+            // Returns local time strings like "2026-03-22T06:12"
+            const srStr = data.daily.sunrise[0]; // "YYYY-MM-DDTHH:MM"
+            const ssStr = data.daily.sunset[0];
+
+            const srParts = srStr.split('T')[1].split(':');
+            const ssParts = ssStr.split('T')[1].split(':');
+
+            const srH = parseInt(srParts[0]), srM = parseInt(srParts[1]);
+            const ssH = parseInt(ssParts[0]), ssM = parseInt(ssParts[1]);
+
+            sunriseMin = srH * 60 + srM;
+            sunsetMin  = ssH * 60 + ssM;
+            lastSunDate = dateKey;
+
+            // Format for display
+            const fmt = (h, m) => {
+                const period = h >= 12 ? 'PM' : 'AM';
+                const hh = h % 12 || 12;
+                return `${String(hh).padStart(2,'0')}:${String(m).padStart(2,'0')} ${period}`;
+            };
+
+            document.getElementById('sunriseVal').textContent = fmt(srH, srM);
+            document.getElementById('sunsetVal').textContent  = fmt(ssH, ssM);
+            drawSunArc();
+        } catch(e) { /* silent fail */ }
+    }
+
+    function drawSunArc() {
+        if (sunriseMin === null || sunsetMin === null) return;
+        const wrap = document.getElementById('sunArcWrap');
+        if (!wrap) return;
+        const W = (wrap.parentElement ? wrap.parentElement.offsetWidth : 0) || 300;
+        const H = 80;
+        const now    = new Date();
+        const curMin = now.getHours() * 60 + now.getMinutes();
+        const raw    = (curMin - sunriseMin) / (sunsetMin - sunriseMin);
+        const progress  = Math.max(0, Math.min(1, raw));
+        const isDaytime = curMin >= sunriseMin && curMin <= sunsetMin;
+        const padX = 72, yBot = H - 8, yPeak = 10;
+        const x0 = padX, x1 = W - padX, mx = (x0 + x1) / 2;
+        const t  = progress;
+        const bx = (1-t)*(1-t)*x0 + 2*(1-t)*t*mx + t*t*x1;
+        const by = (1-t)*(1-t)*yBot + 2*(1-t)*t*yPeak + t*t*yBot;
+        const dark    = document.body.classList.contains('dark');
+        const arcDim  = dark ? 'rgba(180,160,120,0.2)' : 'rgba(160,130,60,0.2)';
+        const arcWarm = dark ? 'rgba(255,190,60,0.7)'  : 'rgba(210,140,10,0.65)';
+        const dotClr  = isDaytime ? '#F5A000' : '#B0A898';
+        const glow    = isDaytime ? 'rgba(245,160,0,0.3)' : 'transparent';
+        const horiz   = dark ? 'rgba(180,160,120,0.15)' : 'rgba(160,130,60,0.15)';
+        const pmx = x0 + (mx - x0) * t;
+        const pmy = yBot + (yPeak - yBot) * t;
+        wrap.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="${x0-8}" y1="${yBot}" x2="${x1+8}" y2="${yBot}" stroke="${horiz}" stroke-width="1" stroke-dasharray="3 5"/>
+            <path d="M ${x0} ${yBot} Q ${mx} ${yPeak} ${x1} ${yBot}" stroke="${arcDim}" stroke-width="2" fill="none" stroke-linecap="round"/>
+            ${isDaytime ? `<path d="M ${x0} ${yBot} Q ${pmx} ${pmy} ${bx} ${by}" stroke="${arcWarm}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <circle cx="${bx}" cy="${by}" r="12" fill="${glow}"/>` : ''}
+            <circle cx="${bx}" cy="${by}" r="5" fill="${dotClr}"/>
+            <circle cx="${bx-1.5}" cy="${by-1.5}" r="1.8" fill="white" fill-opacity="0.6"/>
+        </svg>`;
+    }
+
+        function tick() { updateStatus(); buildSchedule(); updateHeaderPill(); checkSmartAlerts(); drawSunArc(); }
 
     // Load remote data first, then start the app
     loadScheduleData().then(() => {
         updateStats();
         tick();
         setInterval(tick, 1000);
+        fetchSunTimes();
+        setInterval(fetchSunTimes, 60 * 60 * 1000);
         buildRamadanTable();
         if (isRamadanOver()) {
-            document.getElementById('ramadanCard').style.display = 'none';
-        } else if (isEidActive()) {
-            triggerEidMode();
+            // already hidden by CSS
         } else {
+            document.getElementById('ramadanCard').style.display = '';
             updateRamadanCard();
             setInterval(updateRamadanCard, 30000);
         }
@@ -2856,16 +2905,6 @@
         const text      = document.getElementById('pillText');
         const countdown = document.getElementById('pillCountdown');
         const divider   = document.querySelector('.pill-divider');
-
-        // Eid override
-        if (!isRamadanOver() && isEidActive()) {
-            dot.style.display      = 'none';
-            if (divider) divider.style.display = 'none';
-            text.textContent       = '🌙 عید مبارک · Eid Mubarak';
-            text.style.color       = '#B45309';
-            countdown.textContent  = '';
-            return;
-        }
 
         // Reset any Eid overrides
         dot.style.display = '';
@@ -2976,10 +3015,7 @@
         }
         // Check Eid mode first — last day after iftaar
         const isEidTime = (rozaDisplay > 30);
-        if (isEidTime) {
-            triggerEidMode();
-            return;
-        }
+        if (isEidTime) return;
 
         if (rozaDisplay >= 1 && rozaDisplay <= 30) {
             badge.textContent = `Roza ${rozaDisplay}`;
@@ -3071,31 +3107,9 @@
         }
     }
 
-    function triggerEidMode() {
-        const card    = document.getElementById('ramadanCard');
-        const wrapper = document.getElementById('eidPillWrapper');
-        card.classList.add('eid-mode');
-        wrapper.classList.add('show');
-        // Clear any alert interval
-        if (rmAlertInterval) { clearInterval(rmAlertInterval); rmAlertInterval = null; }
-    }
-
     function isRamadanOver() {
         // From March 23 onwards — event is closed
         return new Date() >= new Date('2026-03-23T00:00:00');
-    }
-
-    function isEidActive() {
-        const now = new Date();
-        // Eid window: after last Iftaar (Mar 20 18:46) through end of Mar 22
-        if (isRamadanOver()) return false;
-        const key = getDateKey(now);
-        const lastDay = ramadanData['2026-03-20'];
-        if (!lastDay) return false;
-        const curMins = now.getHours()*60 + now.getMinutes();
-        const isLastDay = key === '2026-03-20';
-        const isEidDay  = key === '2026-03-21' || key === '2026-03-22';
-        return (isLastDay && curMins >= toMin(lastDay.iftar)) || isEidDay;
     }
 
     function buildRamadanTable() {
@@ -3134,7 +3148,7 @@
     // Ramadan init handled inside loadScheduleData().then() above
 
     // ── PWA: Service Worker registration + update detection ──
-    const SW_VERSION = 'tapper-v12'; // must match CACHE in sw.js
+    const SW_VERSION = 'tapper-v14'; // must match CACHE in sw.js
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
