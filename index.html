@@ -2779,6 +2779,7 @@
     async function fetchSunTimes() {
         const today = new Date();
         const dateKey = today.toISOString().slice(0, 10);
+        // Always re-fetch if date has changed since last fetch
         if (dateKey === lastSunDate && sunriseMin !== null) return;
         try {
             // Use Open-Meteo — free, no key, excellent CORS support
@@ -3148,7 +3149,7 @@
     // Ramadan init handled inside loadScheduleData().then() above
 
     // ── PWA: Service Worker registration + update detection ──
-    const SW_VERSION = 'tapper-v16'; // must match CACHE in sw.js
+    const SW_VERSION = 'tapper-v17'; // must match CACHE in sw.js
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {

@@ -1,4 +1,4 @@
-const CACHE = 'tapper-v16';
+const CACHE = 'tapper-v17';
 
 const PRECACHE = [
     './index.html',
@@ -37,6 +37,18 @@ self.addEventListener('message', e => {
 self.addEventListener('fetch', e => {
     if (e.request.method !== 'GET') return;
     const url = new URL(e.request.url);
+
+    // Never cache external API calls — always fresh from network
+    // If network fails, just let it fail (app handles gracefully)
+    const neverCache = url.hostname.includes('open-meteo.com')
+        || url.hostname.includes('sunrise-sunset.org')
+        || url.hostname.includes('api.');
+
+    if (neverCache) {
+        e.respondWith(fetch(e.request).catch(() => new Response('', { status: 503 })));
+        return;
+    }
+
     const networkFirst = url.pathname.endsWith('schedule.json') || url.hostname.includes('fonts.g');
 
     if (networkFirst) {
