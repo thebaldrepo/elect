@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Electricity Schedule — Tapper</title>
-    <meta name="description" content="Live electricity schedule and authority contact details for Tapper locality, Pattan area.">
+    <title>Tapper / Hamray Grid Electricity Schedule</title>
+    <meta name="description" content="Live electricity schedule for Tapper/Hamray Grid Station — covering Tapper, Hamray, Lolipora, Wanigam and adjoining areas.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
@@ -12,7 +12,7 @@
     <meta name="theme-color" content="#1A1714">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Tapper">
+    <meta name="apple-mobile-web-app-title" content="Tapper/Hamray Grid">
     <link rel="apple-touch-icon" href="icon.png">
     <style>
         :root {
@@ -1330,6 +1330,221 @@
             z-index: 0;
         }
 
+        /* ── Feeder Selector ── */
+        .feeder-selector-wrap {
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        .feeder-selector-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .feeder-selector-btn:active { border-color: var(--border-strong); }
+
+        .feeder-selector-text { flex: 1; min-width: 0; }
+
+        .feeder-selector-eyebrow {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65em;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 3px;
+        }
+
+        .feeder-selector-label {
+            font-family: 'Fraunces', serif;
+            font-size: 1.08em;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.2px;
+            margin-bottom: 2px;
+        }
+
+        .feeder-selector-localities {
+            font-size: 0.76em;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .feeder-selector-chevron {
+            font-size: 1.3em;
+            color: var(--text-light);
+            flex-shrink: 0;
+            transition: transform 0.25s ease;
+        }
+
+        .feeder-selector-wrap.open .feeder-selector-chevron { transform: rotate(180deg); }
+
+        .feeder-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0; right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            z-index: 50;
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: max-height 0.3s ease, opacity 0.25s ease;
+        }
+
+        .feeder-selector-wrap.open .feeder-dropdown {
+            max-height: 400px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .feeder-option {
+            padding: 14px 18px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s ease;
+        }
+
+        .feeder-option:last-child { border-bottom: none; }
+        .feeder-option:active { background: var(--surface-2); }
+
+        .feeder-option-label {
+            font-family: 'Fraunces', serif;
+            font-size: 0.96em;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .feeder-option-localities {
+            font-size: 0.74em;
+            color: var(--text-muted);
+        }
+
+        .feeder-option.active .feeder-option-label { color: var(--on); }
+        .feeder-option.active { background: rgba(26,107,74,0.05); }
+        body.dark .feeder-option.active { background: rgba(61,184,122,0.08); }
+
+        /* No-data card for feeders without schedule */
+        .feeder-nodata-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 20px;
+            margin-bottom: 14px;
+        }
+
+        .feeder-nodata-icon { font-size: 1.3em; flex-shrink: 0; }
+
+        .feeder-nodata-text {
+            font-size: 0.86em;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ── Short Notice Card ── */
+        .notice-card {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            padding: 20px 22px;
+            background: rgba(155, 35, 53, 0.05);
+            border-color: rgba(155, 35, 53, 0.18);
+        }
+
+        body.dark .notice-card {
+            background: rgba(224, 92, 110, 0.08);
+            border-color: rgba(224, 92, 110, 0.22);
+        }
+
+        .notice-icon {
+            font-size: 1.2em;
+            line-height: 1;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .notice-body { flex: 1; min-width: 0; }
+
+        .notice-title {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72em;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #9B2335;
+            margin-bottom: 6px;
+        }
+
+        body.dark .notice-title { color: #E0727F; }
+
+        .notice-text {
+            font-size: 0.86em;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        /* ── Important Information Page ── */
+        .info-card { padding: 24px 24px 20px; }
+
+        .info-card-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 16px;
+            letter-spacing: -0.3px;
+        }
+
+        .info-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .info-list li {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            font-size: 0.88em;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        .info-list li::before {
+            content: '•';
+            color: var(--text-light);
+            flex-shrink: 0;
+            font-size: 1.1em;
+            line-height: 1.4;
+        }
+
+        .info-disclaimer {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            font-size: 0.78em;
+            color: var(--text-light);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
                 /* ── Coming Soon Card ── */
         .coming-soon-card {
             padding: 56px 32px;
@@ -1497,11 +1712,11 @@
 <header class="topbar">
     <div class="topbar-brand" onclick="goHome()">
         <div class="topbar-logo">⚡</div>
-        <div class="topbar-title">Tapper <span>/ Electricity</span></div>
+        <div class="topbar-title">Power Schedule <span>· Tapper Grid</span></div>
     </div>
     <nav class="topbar-nav">
         <button class="nav-btn active" onclick="showPage('schedule', this)" id="navSchedule">Schedule</button>
-        <button class="nav-btn" onclick="showPage('contacts', this)" id="navContacts">Contacts</button>
+        <button class="nav-btn" onclick="showPage('contacts', this)" id="navContacts">Information</button>
         <button class="nav-btn" onclick="openSettings()">⚙</button>
     </nav>
 
@@ -1543,6 +1758,42 @@
 <div class="page active" id="schedulePage">
     <div class="content">
 
+        <!-- Feeder Selector -->
+        <div class="feeder-selector-wrap">
+            <button class="feeder-selector-btn" id="feederSelectorBtn" onclick="toggleFeederDropdown()">
+                <div class="feeder-selector-text">
+                    <div class="feeder-selector-eyebrow" id="feederAreaLabel">Area</div>
+                    <div class="feeder-selector-label" id="feederSelectedLabel">Tapper / Hamray Feeder</div>
+                    <div class="feeder-selector-localities" id="feederSelectedLocalities">Takiya Tapper, Tapper Payeen, Hamray, Adjoining areas</div>
+                </div>
+                <div class="feeder-selector-chevron">⌄</div>
+            </button>
+            <div class="feeder-dropdown" id="feederDropdown">
+                <div class="feeder-option" data-feeder="hamray" onclick="selectFeeder('hamray')">
+                    <div class="feeder-option-label">Tapper / Hamray Feeder</div>
+                    <div class="feeder-option-localities">Takiya Tapper, Tapper Payeen, Hamray, Adjoining areas</div>
+                </div>
+                <div class="feeder-option" data-feeder="tapperbala" onclick="selectFeeder('tapperbala')">
+                    <div class="feeder-option-label">Tapper Bala Feeder</div>
+                    <div class="feeder-option-localities">Tapper Bala, Adjoining areas</div>
+                </div>
+                <div class="feeder-option" data-feeder="lolipora" onclick="selectFeeder('lolipora')">
+                    <div class="feeder-option-label">Lolipora Feeder</div>
+                    <div class="feeder-option-localities">Lolipora, Adjoining areas</div>
+                </div>
+                <div class="feeder-option" data-feeder="wanigam" onclick="selectFeeder('wanigam')">
+                    <div class="feeder-option-label">Wanigam Feeder</div>
+                    <div class="feeder-option-localities">Wanigam, Adjoining areas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No data notice for feeders without schedule yet -->
+        <div class="card feeder-nodata-card" id="feederNoData" style="display:none;">
+            <div class="feeder-nodata-icon">🛠️</div>
+            <div class="feeder-nodata-text" id="feederNoDataTxt">Schedule for this feeder hasn't been added yet. Check back soon.</div>
+        </div>
+
         <!-- Ramadan Card -->
         <div class="card ramadan-card" id="ramadanCard">
             <div class="rm-header">
@@ -1550,7 +1801,7 @@
                     <span class="rm-moon">🌙</span>
                     <div>
                         <div class="rm-title">رمضان مبارک</div>
-                        <div class="rm-subtitle">Baramulla · Tapper</div>
+                        <div class="rm-subtitle">Baramulla · Tapper/Hamray</div>
                     </div>
                 </div>
                 <div class="rm-roza-badge" id="rmRozaBadge">—</div>
@@ -1787,6 +2038,15 @@
             <button class="toggle-all-btn" id="toggleAllBtn" onclick="toggleAllDays()">Show all days ↓</button>
         </div>
 
+        <!-- Short Notice -->
+        <div class="card notice-card">
+            <div class="notice-icon">⚠️</div>
+            <div class="notice-body">
+                <div class="notice-title" id="noticeTitle">Short Notice</div>
+                <div class="notice-text" id="noticeText">The schedule is based on the official feeder roster. Actual power availability may differ due to faults, maintenance work, grid rotation, or operational requirements. The official roster shall prevail in case of any discrepancy.</div>
+            </div>
+        </div>
+
         <div class="page-footer">
             <span id="footerTxt">Put together by T & W — use it, share it, hope it helps. 🙂</span>
         </div>
@@ -1822,6 +2082,23 @@
                 <a href="tel:+910000000000" class="call-btn">📞 Call</a>
             </div>
         </div>
+
+        <!-- Important Information -->
+        <div class="card info-card">
+            <div class="info-card-title" id="infoCardTitle">Important Information</div>
+            <ul class="info-list" id="infoList">
+                <li id="info1">The schedule displayed on this website is derived from the official power curtailment programme issued by the concerned electricity authorities.</li>
+                <li id="info2">Timings are presented in a simplified and user-friendly format to help residents easily understand expected power availability.</li>
+                <li id="info3">The locality names listed on this website are provided only as a general guide. Some households within the same village may be connected to different feeders and should follow the schedule applicable to their actual feeder connection.</li>
+                <li id="info4">Actual power supply may vary due to grid rotation, load management, maintenance activities, technical faults, weather conditions, or other operational requirements.</li>
+                <li id="info5">Electricity may be restored before the scheduled time or interrupted during an ON period depending upon system requirements and power availability.</li>
+                <li id="info6">Essential feeders and emergency services may be given priority by the electricity authorities.</li>
+                <li id="info7">This website is an independent informational platform and is not affiliated with or operated by the Power Development Department (PDD), KPDCL, or any government authority.</li>
+                <li id="info8">The information provided is intended for convenience only and should not be treated as an assurance or guarantee of uninterrupted power supply.</li>
+                <li id="info9">In the event of any discrepancy, the official roster and instructions issued by the concerned electricity authorities shall prevail.</li>
+            </ul>
+            <div class="info-disclaimer" id="feederNote">Note: Feeder boundaries are determined by the electricity department and may not always correspond exactly with village or locality boundaries. If your area receives power according to a different feeder pattern, please follow the feeder that matches your actual power supply timings.</div>
+        </div>
         <div class="page-footer"><span id="footerTxt2">Put together by T & W — use it, share it, hope it helps. 🙂</span></div>
     </div>
 </div>
@@ -1830,20 +2107,78 @@
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
     // ── Data — loaded from schedule.json, fallback to defaults ──
-    let schedule = {
-        Monday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'12:00'},{start:'14:00',end:'16:00'},{start:'18:00',end:'23:59'}],
-        Tuesday:   [{start:'00:00',end:'10:00'},{start:'12:00',end:'14:00'},{start:'16:00',end:'18:00'},{start:'20:00',end:'23:59'}],
-        Wednesday: [{start:'00:00',end:'08:00'},{start:'10:00',end:'12:00'},{start:'14:00',end:'16:00'},{start:'18:00',end:'23:59'}],
-        Thursday:  [{start:'00:00',end:'10:00'},{start:'12:00',end:'14:00'},{start:'16:00',end:'18:00'},{start:'20:00',end:'23:59'}],
-        Friday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'12:00'},{start:'14:00',end:'16:00'},{start:'18:00',end:'23:59'}],
-        Saturday:  [{start:'00:00',end:'10:00'},{start:'12:00',end:'14:00'},{start:'16:00',end:'18:00'},{start:'20:00',end:'23:59'}],
-        Sunday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'12:00'},{start:'14:00',end:'16:00'},{start:'18:00',end:'23:59'}]
+    // ── Multi-feeder data ──
+    // `feeders` holds all feeder definitions once loaded from schedule.json
+    // `schedule` always points to the CURRENTLY SELECTED feeder's schedule object
+    // so all existing code that reads schedule[day] keeps working unchanged.
+    let feeders = {
+        hamray: {
+            label: 'Tapper / Hamray Feeder',
+            localities: ['Takiya Tapper', 'Tapper Payeen', 'Hamray', 'Adjoining areas'],
+            schedule: {
+                Monday:    [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Tuesday:   [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Wednesday: [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Thursday:  [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Friday:    [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Saturday:  [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Sunday:    [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}]
+            }
+        },
+        tapperbala: {
+            label: 'Tapper Bala Feeder',
+            localities: ['Tapper Bala', 'Adjoining areas'],
+            schedule: {
+                Monday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Tuesday:   [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Wednesday: [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Thursday:  [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Friday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Saturday:  [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Sunday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}]
+            }
+        },
+        lolipora: {
+            label: 'Lolipora Feeder',
+            localities: ['Lolipora', 'Adjoining areas'],
+            schedule: {
+                Monday:    [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Tuesday:   [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Wednesday: [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Thursday:  [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Friday:    [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Saturday:  [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Sunday:    [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}]
+            }
+        },
+        wanigam: {
+            label: 'Wanigam Feeder',
+            localities: ['Wanigam', 'Adjoining areas'],
+            schedule: {
+                Monday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Tuesday:   [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Wednesday: [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Thursday:  [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Friday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}],
+                Saturday:  [{start:'00:00',end:'06:00'},{start:'08:00',end:'12:00'},{start:'14:00',end:'18:00'},{start:'20:00',end:'23:59'}],
+                Sunday:    [{start:'00:00',end:'08:00'},{start:'10:00',end:'14:00'},{start:'16:00',end:'20:00'},{start:'22:00',end:'23:59'}]
+            }
+        }
     };
+
+    let currentFeederId = localStorage.getItem('selectedFeeder') || 'hamray';
+    // Fallback to hamray if stored feeder id no longer exists
+    if (!feeders[currentFeederId]) currentFeederId = 'hamray';
+
+    // `schedule` points to the active feeder's schedule (or empty week if null/missing)
+    const EMPTY_WEEK = { Monday:[], Tuesday:[], Wednesday:[], Thursday:[], Friday:[], Saturday:[], Sunday:[] };
+    let schedule = feeders[currentFeederId].schedule || EMPTY_WEEK;
 
     let urduEnabled  = localStorage.getItem('urduEnabled')  === 'true';
     let notifEnabled = localStorage.getItem('notifEnabled') === 'true';
     let soundEnabled = localStorage.getItem('soundEnabled') === 'true';
     let darkEnabled  = localStorage.getItem('darkEnabled')  === 'true';
+
 
     // Apply dark mode immediately on load to avoid flash
     if (darkEnabled) document.body.classList.add('dark');
@@ -1852,7 +2187,7 @@
     const T = {
         en: {
             navSchedule:    'Schedule',
-            navContacts:    'Contacts',
+            navContacts:    'Information',
             lblPreferences: 'Preferences',
             lblNotif:       '🔔 Notifications',
             lblSound:       '🔊 Sound Alerts',
@@ -1878,18 +2213,33 @@
             statusInactive: 'Currently Inactive',
             powerOn:        'Power is On',
             powerOff:       'Power is Off',
-            powerOnSub:     'Electricity is available in Tapper',
-            powerOffSub:    'No power supply in Tapper right now',
+            powerOnSub:     'Electricity is available in {loc} area',
+            powerOffSub:    'No power supply in {loc} area right now',
             countdownOn:    'until power goes off',
             countdownOff:   'until electricity returns',
             nudgeTitle:     'Finding this useful?',
             nudgeSub:       'Share it with your neighbours',
             toggleAllShow:  'Show all days ↓',
             toggleAllHide:  'Show less ↑',
+            noticeTitle:    'INFO',
+            noticeText:     'The schedule is based on the official feeder roster. Actual power availability may differ due to faults, maintenance work, grid rotation, or operational requirements. The official roster shall prevail in case of any discrepancy.',
+            infoCardTitle:  'Important Information',
+            info1: 'The schedule displayed on this website is derived from the official power curtailment programme issued by the concerned electricity authorities.',
+            info2: 'Timings are presented in a simplified and user-friendly format to help residents easily understand expected power availability.',
+            info3: 'The locality names listed on this website are provided only as a general guide. Some households within the same village may be connected to different feeders and should follow the schedule applicable to their actual feeder connection.',
+            info4: 'Actual power supply may vary due to grid rotation, load management, maintenance activities, technical faults, weather conditions, or other operational requirements.',
+            info5: 'Electricity may be restored before the scheduled time or interrupted during an ON period depending upon system requirements and power availability.',
+            info6: 'Essential feeders and emergency services may be given priority by the electricity authorities.',
+            info7: 'This website is an independent informational platform and is not affiliated with or operated by the Power Development Department (PDD), KPDCL, or any government authority.',
+            info8: 'The information provided is intended for convenience only and should not be treated as an assurance or guarantee of uninterrupted power supply.',
+            info9: 'In the event of any discrepancy, the official roster and instructions issued by the concerned electricity authorities shall prevail.',
+            feederNote: 'Note: Feeder boundaries are determined by the electricity department and may not always correspond exactly with village or locality boundaries. If your area receives power according to a different feeder pattern, please follow the feeder that matches your actual power supply timings.',
+            feederAreaLabel: 'Area',
+            feederNoDataTxt: 'Schedule for this feeder hasn\'t been added yet. Check back soon.',
         },
         ur: {
             navSchedule:    'شیڈول',
-            navContacts:    'رابطے',
+            navContacts:    'معلومات',
             lblPreferences: 'ترجیحات',
             lblNotif:       '🔔 اطلاعات',
             lblSound:       '🔊 آواز',
@@ -1915,19 +2265,40 @@
             statusInactive: 'بجلی نہیں ہے',
             powerOn:        'بجلی آ گئی',
             powerOff:       'بجلی چلی گئی',
-            powerOnSub:     'ٹیپر میں ابھی بجلی دستیاب ہے',
-            powerOffSub:    'ٹیپر میں ابھی بجلی نہیں ہے',
+            powerOnSub:     '{loc} علاقے میں ابھی بجلی دستیاب ہے',
+            powerOffSub:    '{loc} علاقے میں ابھی بجلی نہیں ہے',
             countdownOn:    'بجلی جانے میں',
             countdownOff:   'بجلی آنے میں',
             nudgeTitle:     'مفید لگا؟',
             nudgeSub:       'اپنے پڑوسیوں کو بھی بھیجیں',
             toggleAllShow:  'تمام دن دکھائیں ↓',
             toggleAllHide:  'کم دکھائیں ↑',
+            noticeTitle:    'INFO',
+            noticeText:     'یہ شیڈول سرکاری فیڈر روسٹر پر مبنی ہے۔ خرابی، مرمت کے کام، گرڈ گردش یا آپریشنل ضروریات کی وجہ سے اصل بجلی کی فراہمی مختلف ہو سکتی ہے۔ کسی بھی اختلاف کی صورت میں سرکاری روسٹر کو ترجیح حاصل ہوگی۔',
+            infoCardTitle:  'اہم معلومات',
+            info1: 'اس ویب سائٹ پر دکھایا گیا شیڈول متعلقہ بجلی حکام کی جانب سے جاری کردہ سرکاری بجلی کٹوتی پروگرام پر مبنی ہے۔',
+            info2: 'رہائشیوں کو بجلی کی متوقع دستیابی آسانی سے سمجھنے میں مدد کے لیے اوقات کو آسان اور قابلِ فہم انداز میں پیش کیا گیا ہے۔',
+            info3: 'اس ویب سائٹ پر دی گئی علاقوں کی فہرست صرف عمومی رہنمائی کے لیے ہے۔ ایک ہی گاؤں کے کچھ گھرانے مختلف فیڈرز سے منسلک ہو سکتے ہیں اور انہیں اپنے اصل فیڈر کنکشن کے مطابق شیڈول پر عمل کرنا چاہیے۔',
+            info4: 'گرڈ گردش، لوڈ مینجمنٹ، مرمتی کاموں، تکنیکی خرابیوں، موسمی حالات یا دیگر آپریشنل ضروریات کی وجہ سے اصل بجلی کی فراہمی مختلف ہو سکتی ہے۔',
+            info5: 'سسٹم کی ضروریات اور بجلی کی دستیابی کے مطابق بجلی مقررہ وقت سے پہلے بحال ہو سکتی ہے یا آن پیریڈ کے دوران منقطع ہو سکتی ہے۔',
+            info6: 'ضروری فیڈرز اور ہنگامی خدمات کو بجلی حکام کی جانب سے ترجیح دی جا سکتی ہے۔',
+            info7: 'یہ ویب سائٹ ایک آزاد معلوماتی پلیٹ فارم ہے اور پاور ڈویلپمنٹ ڈیپارٹمنٹ (PDD)، KPDCL، یا کسی بھی سرکاری ادارے سے وابستہ یا اس کے زیرِ انتظام نہیں ہے۔',
+            info8: 'فراہم کردہ معلومات صرف سہولت کے لیے ہیں اور انہیں بلاتعطل بجلی کی فراہمی کی ضمانت یا یقین دہانی نہ سمجھا جائے۔',
+            info9: 'کسی بھی اختلاف کی صورت میں، متعلقہ بجلی حکام کی جانب سے جاری کردہ سرکاری روسٹر اور ہدایات کو ترجیح حاصل ہوگی۔',
+            feederNote: 'نوٹ: فیڈر کی حدود بجلی کے محکمے کی جانب سے طے کی جاتی ہیں اور ہمیشہ گاؤں یا علاقے کی حدود سے بالکل مطابقت نہیں رکھتیں۔ اگر آپ کے علاقے میں بجلی کسی مختلف فیڈر پیٹرن کے مطابق آتی ہے تو براہ کرم اس فیڈر کی پیروی کریں جو آپ کی اصل بجلی کی فراہمی کے اوقات سے مطابقت رکھتا ہو۔',
+            feederAreaLabel: 'علاقہ',
+            feederNoDataTxt: 'اس فیڈر کا شیڈول ابھی شامل نہیں کیا گیا۔ جلد دوبارہ چیک کریں۔',
         }
     };
 
     function getLang() { return urduEnabled ? 'ur' : 'en'; }
-    function t(key) { return T[getLang()][key] || T.en[key] || ''; }
+    function t(key) {
+        let str = T[getLang()][key] || T.en[key] || '';
+        if (str.indexOf('{loc}') !== -1) {
+            str = str.replace(/\{loc\}/g, currentLocalityName());
+        }
+        return str;
+    }
 
     function applyLanguage() {
         const lang = getLang();
@@ -1945,7 +2316,10 @@
                      'lblDark','shareBtnTxt','countdownEyebrow','statsEyebrow',
                      'statNameOn','statNameOff','timelineEyebrow','legendOn','legendOff',
                      'tlHintTxt','scheduleTitle','footerTxt','footerTxt2','csTitleTxt',
-                     'csSubTxt','roleLineman','roleInspector','nudgeTitle','nudgeSub'];
+                     'csSubTxt','roleLineman','roleInspector','nudgeTitle','nudgeSub',
+                     'noticeTitle','noticeText','infoCardTitle',
+                     'info1','info2','info3','info4','info5','info6','info7','info8','info9','feederNote',
+                     'feederAreaLabel','feederNoDataTxt'];
         ids.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.textContent = t(id);
@@ -1997,8 +2371,8 @@
                     banner.classList.remove('show');
                     try {
                         await navigator.share({
-                            title: 'Tapper Electricity Schedule',
-                            text: 'Check live electricity schedule for Tapper:',
+                            title: 'Tapper/Hamray Grid Electricity Schedule',
+                            text: 'Check live electricity schedule for ' + currentLocalityName() + ':',
                             url: window.location.href
                         });
                     } catch(e) {}
@@ -2055,12 +2429,41 @@
     let rmLastAlertMode = false;
 
     // ── Load schedule.json — silently uses fallback if offline or missing ──
+    function toggleFeederDropdown() {
+        document.querySelector('.feeder-selector-wrap').classList.toggle('open');
+    }
+
+    function selectFeeder(feederId) {
+        switchFeeder(feederId);
+        document.querySelector('.feeder-selector-wrap').classList.remove('open');
+    }
+
+    // Close dropdown when tapping outside
+    document.addEventListener('click', (e) => {
+        const wrap = document.querySelector('.feeder-selector-wrap');
+        if (wrap && wrap.classList.contains('open') && !wrap.contains(e.target)) {
+            wrap.classList.remove('open');
+        }
+    });
+
     async function loadScheduleData() {
         try {
             const res  = await fetch('./schedule.json', { cache: 'no-cache' });
             if (!res.ok) return;
             const data = await res.json();
-            if (data.schedule)    schedule    = data.schedule;
+
+            // ── New multi-feeder format ──
+            if (data.feeders) {
+                feeders = data.feeders;
+                if (!feeders[currentFeederId]) currentFeederId = Object.keys(feeders)[0];
+                schedule = feeders[currentFeederId].schedule || EMPTY_WEEK;
+            }
+            // ── Backward compatibility — old flat schedule format ──
+            else if (data.schedule) {
+                feeders.hamray.schedule = data.schedule;
+                if (currentFeederId === 'hamray') schedule = data.schedule;
+            }
+
             if (data.ramadanData) ramadanData = data.ramadanData;
 
             // ── Version check — show update banner if schedule.json has a newer version ──
@@ -2074,6 +2477,56 @@
         } catch(e) {
             // Offline or fetch failed — built-in fallback data already in place
         }
+    }
+
+    // ── Switch active feeder, persist choice, refresh everything ──
+    function switchFeeder(feederId) {
+        if (!feeders[feederId]) return;
+        currentFeederId = feederId;
+        localStorage.setItem('selectedFeeder', feederId);
+        schedule = feeders[feederId].schedule || EMPTY_WEEK;
+
+        // Reset per-feeder UI state
+        notifiedPower15 = false;
+        power15SlotEnd  = '';
+
+        updateFeederSelectorUI();
+        updateStats();
+        buildSchedule();
+        updateTimeline();
+        tick();
+    }
+
+    // Returns a short, human-friendly name for the active feeder/locality
+    // used in status text like "No power supply in {name} area right now"
+    function currentLocalityName() {
+        // Hamray feeder's display name is "Tapper" specifically
+        if (currentFeederId === 'hamray') return 'Tapper';
+        const feeder = feeders[currentFeederId];
+        if (!feeder) return 'this';
+        if (feeder.localities && feeder.localities.length) {
+            return feeder.localities[0]; // first listed locality is the primary name
+        }
+        return feeder.label || 'this';
+    }
+
+    function updateFeederSelectorUI() {
+        const labelEl = document.getElementById('feederSelectedLabel');
+        const localEl = document.getElementById('feederSelectedLocalities');
+        const feeder   = feeders[currentFeederId];
+        if (!feeder) return;
+        if (labelEl) labelEl.textContent = feeder.label;
+        if (localEl) localEl.textContent = (feeder.localities || []).join(', ');
+
+        // Mark active item in dropdown list
+        document.querySelectorAll('.feeder-option').forEach(el => {
+            el.classList.toggle('active', el.dataset.feeder === currentFeederId);
+        });
+
+        // Show "no data yet" notice if this feeder has no schedule
+        const noDataEl = document.getElementById('feederNoData');
+        const hasData  = feeder.schedule && Object.keys(feeder.schedule).some(d => feeder.schedule[d].length > 0);
+        if (noDataEl) noDataEl.style.display = hasData ? 'none' : 'flex';
     }
 
     // Show update banner directly (version-based, no SW waiting needed)
@@ -2244,12 +2697,13 @@
 
         // ── Power status flip ──
         if (lastPowerStatus !== on) {
+            const loc = currentLocalityName();
             if (on) {
                 playSoundOn();
-                sendNotif('⚡ Power is Back ON', 'Electricity restored in Tapper', 'power-status');
+                sendNotif('⚡ Power is Back ON', 'Electricity restored in ' + loc + ' area', 'power-status');
             } else {
                 playSoundOff();
-                sendNotif('🔌 Power went OFF', 'No electricity in Tapper right now', 'power-status');
+                sendNotif('🔌 Power went OFF', 'No electricity in ' + loc + ' area right now', 'power-status');
             }
             // Reset 15-min flag so it can fire for the new ON slot
             notifiedPower15 = false;
@@ -2269,7 +2723,7 @@
                     const minsLeft = slotEnd - curMin;
                     // Fire when between 14 and 16 mins left (catches the minute reliably)
                     if (minsLeft <= 15 && minsLeft > 0 && power15SlotEnd !== s.end) {
-                        sendNotif('⚠️ Power going OFF in ~' + minsLeft + ' mins', 'Tapper — save your work', 'power-warn');
+                        sendNotif('⚠️ Power going OFF in ~' + minsLeft + ' mins', currentLocalityName() + ' area — save your work', 'power-warn');
                         playSoundAlert();
                         notifiedPower15 = true;
                         power15SlotEnd  = s.end;
@@ -2287,14 +2741,14 @@
 
             // 10-min Sehri warning
             if (!notifiedSehri10 && curMin >= sehriMin - 10 && curMin < sehriMin) {
-                sendNotif('🌙 Sehri ends in 10 minutes', 'Finish eating soon — Tapper', 'sehri-warn');
+                sendNotif('🌙 Sehri ends in 10 minutes', 'Finish eating soon — Tapper/Hamray', 'sehri-warn');
                 playSoundAlert();
                 notifiedSehri10 = true;
             }
 
             // 10-min Iftaar warning
             if (!notifiedIftar10 && curMin >= iftarMin - 10 && curMin < iftarMin) {
-                sendNotif('🤲 Iftaar in 10 minutes', 'Almost time to break your fast — Tapper', 'iftar-warn');
+                sendNotif('🤲 Iftaar in 10 minutes', 'Almost time to break your fast — Tapper/Hamray', 'iftar-warn');
                 playSoundAlert();
                 notifiedIftar10 = true;
             }
@@ -2329,7 +2783,8 @@
         const now = new Date();
 
         const headline = on ? 'Power is On'  : 'Power is Off';
-        const subline  = on ? 'Electricity available in Tapper' : 'No power supply in Tapper';
+        const locName  = currentLocalityName();
+        const subline  = on ? `Electricity available in ${locName} area` : `No power supply in ${locName} area`;
         const timeStr  = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
         const dateStr  = now.toLocaleDateString('en-US', { weekday:'long', day:'numeric', month:'long' });
         const ctVal    = document.getElementById('countdownTime').textContent;
@@ -2417,7 +2872,7 @@
         ctx.textAlign    = 'center';
         ctx.textBaseline = 'middle';
         ctx.font = '500 21px Georgia, serif';
-        const locTxt = 'Tapper · Baramulla';
+        const locTxt = locName + ' · Baramulla';
         const lW = ctx.measureText(locTxt).width + 40;
         const lH = 40, lX = cx - lW/2, lY = 42;
         ctx.fillStyle   = 'rgba(255,255,255,0.10)';
@@ -2498,7 +2953,7 @@
         canvas.toBlob(async (blob) => {
             const file = new File([blob], 'electricity-status.png', { type:'image/png' });
             if (navigator.share && navigator.canShare && navigator.canShare({ files:[file] })) {
-                try { await navigator.share({ files:[file], title:'Electricity Status — Tapper', text: 'Check the full schedule at: ' + window.location.href }); return; }
+                try { await navigator.share({ files:[file], title:'Electricity Status — ' + locName, text: 'Check the full schedule at: ' + window.location.href }); return; }
                 catch(e) { if (e.name === 'AbortError') return; }
             }
             const url = URL.createObjectURL(blob);
@@ -2854,6 +3309,7 @@
 
     // Load remote data first, then start the app
     loadScheduleData().then(() => {
+        updateFeederSelectorUI();
         updateStats();
         tick();
         setInterval(tick, 1000);
@@ -3149,7 +3605,7 @@
     // Ramadan init handled inside loadScheduleData().then() above
 
     // ── PWA: Service Worker registration + update detection ──
-    const SW_VERSION = 'tapper-v17'; // must match CACHE in sw.js
+    const SW_VERSION = 'tapper-v25'; // must match CACHE in sw.js
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -3273,7 +3729,7 @@
         <div class="update-banner-icon">🤝</div>
         <div class="update-banner-text">
             <div class="update-banner-title" id="nudgeTitle">Finding this useful?</div>
-            <div class="update-banner-sub" id="nudgeSub">Share Tapper with your neighbours</div>
+            <div class="update-banner-sub" id="nudgeSub">Share it with your neighbours</div>
         </div>
         <button class="install-btn-add" id="nudgeShareBtn">Share ↗</button>
         <button class="install-btn-dismiss" id="nudgeDismiss">✕</button>
@@ -3284,7 +3740,7 @@
         <div class="update-banner-icon">🔄</div>
         <div class="update-banner-text">
             <div class="update-banner-title">Update Available</div>
-            <div class="update-banner-sub">A new version of Tapper is ready</div>
+            <div class="update-banner-sub">A new version is ready</div>
         </div>
         <button class="update-btn-refresh" id="updateBtn">Update</button>
         <button class="update-btn-dismiss" id="updateDismiss">✕</button>
@@ -3295,7 +3751,7 @@
         <div class="install-banner-icon">⚡</div>
         <div class="install-banner-text">
             <div class="install-banner-title">Add to Home Screen</div>
-            <div class="install-banner-sub">Use Tapper like an app — works offline too</div>
+            <div class="install-banner-sub">Use it like an app — works offline too</div>
         </div>
         <div class="install-banner-actions">
             <button class="install-btn-add" id="installBtn">Add</button>
