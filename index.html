@@ -2093,16 +2093,16 @@
             <div class="weather-divider"></div>
             <div class="weather-details">
                 <div class="weather-detail-item">
-                    <div class="weather-detail-label">Today's Range</div>
-                    <div class="weather-detail-val" id="weatherRange">— / —</div>
-                </div>
-                <div class="weather-detail-item">
-                    <div class="weather-detail-label">Precipitation</div>
-                    <div class="weather-detail-val" id="weatherPrecip">—%</div>
+                    <div class="weather-detail-label">Humidity</div>
+                    <div class="weather-detail-val" id="weatherRange">—</div>
                 </div>
                 <div class="weather-detail-item">
                     <div class="weather-detail-label">Rainfall</div>
-                    <div class="weather-detail-val" id="weatherRain">— mm</div>
+                    <div class="weather-detail-val" id="weatherPrecip">—</div>
+                </div>
+                <div class="weather-detail-item">
+                    <div class="weather-detail-label">Wind</div>
+                    <div class="weather-detail-val" id="weatherRain">—</div>
                 </div>
             </div>
         </div>
@@ -2152,13 +2152,13 @@
         <div class="card notice-card">
             <div class="notice-icon">⚠️</div>
             <div class="notice-body">
-                <div class="notice-title" id="noticeTitle">INFO</div>
+                <div class="notice-title" id="noticeTitle">Short Notice</div>
                 <div class="notice-text" id="noticeText">The schedule is based on the official feeder roster. Actual power availability may differ due to faults, maintenance work, grid rotation, or operational requirements. The official roster shall prevail in case of any discrepancy.</div>
             </div>
         </div>
 
         <div class="page-footer">
-            <span id="footerTxt">Put together by T & W — use it, share it. Hope it helps. 🙂</span>
+            <span id="footerTxt">Put together by T & W — use it, share it, hope it helps. 🙂</span>
         </div>
     </div>
 </div>
@@ -2209,7 +2209,7 @@
             </ul>
             <div class="info-disclaimer" id="feederNote">Note: Feeder boundaries are determined by the electricity department and may not always correspond exactly with village or locality boundaries. If your area receives power according to a different feeder pattern, please follow the feeder that matches your actual power supply timings.</div>
         </div>
-        <div class="page-footer"><span id="footerTxt2">Put together by T & W — use it, share it. Hope it helps. 🙂</span></div>
+        <div class="page-footer"><span id="footerTxt2">Put together by T & W — use it, share it, hope it helps. 🙂</span></div>
     </div>
 </div>
 
@@ -2313,8 +2313,8 @@
             legendOff:      'Power OFF',
             tlHintTxt:      'Tap a block to see its time',
             scheduleTitle:  'Weekly Schedule',
-            footerTxt:      'Put together by T & W — use it, share it. Hope it helps. 🙂',
-            footerTxt2:     'Put together by T & W — use it, share it. Hope it helps. 🙂',
+            footerTxt:      'Put together by T & W — use it, share it, hope it helps. 🙂',
+            footerTxt2:     'Put together by T & W — use it, share it, hope it helps. 🙂',
             csTitleTxt:     'Coming Soon',
             csSubTxt:       'Contact details for the local lineman and electricity inspector will be added here shortly.',
             roleLineman:    'Power Supply Officer',
@@ -3808,7 +3808,7 @@
     // Ramadan init handled inside loadScheduleData().then() above
 
     // ── PWA: Service Worker registration + update detection ──
-    const SW_VERSION = 'tapper-v27'; // must match CACHE in sw.js
+    const SW_VERSION = 'tapper-v28'; // must match CACHE in sw.js
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
