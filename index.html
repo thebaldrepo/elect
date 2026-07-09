@@ -2042,13 +2042,13 @@
         <div class="card notice-card">
             <div class="notice-icon">⚠️</div>
             <div class="notice-body">
-                <div class="notice-title" id="noticeTitle">INFO</div>
+                <div class="notice-title" id="noticeTitle">Short Notice</div>
                 <div class="notice-text" id="noticeText">The schedule is based on the official feeder roster. Actual power availability may differ due to faults, maintenance work, grid rotation, or operational requirements. The official roster shall prevail in case of any discrepancy.</div>
             </div>
         </div>
 
         <div class="page-footer">
-            <span id="footerTxt">Put together by T & W — use it, share it. Hope it helps. 🙂</span>
+            <span id="footerTxt">Put together by T & W — use it, share it, hope it helps. 🙂</span>
         </div>
     </div>
 </div>
@@ -2099,7 +2099,7 @@
             </ul>
             <div class="info-disclaimer" id="feederNote">Note: Feeder boundaries are determined by the electricity department and may not always correspond exactly with village or locality boundaries. If your area receives power according to a different feeder pattern, please follow the feeder that matches your actual power supply timings.</div>
         </div>
-        <div class="page-footer"><span id="footerTxt2">Put together by T & W — use it, share it. Hope it helps. 🙂</span></div>
+        <div class="page-footer"><span id="footerTxt2">Put together by T & W — use it, share it, hope it helps. 🙂</span></div>
     </div>
 </div>
 
@@ -2203,8 +2203,8 @@
             legendOff:      'Power OFF',
             tlHintTxt:      'Tap a block to see its time',
             scheduleTitle:  'Weekly Schedule',
-            footerTxt:      'Put together by T & W — use it, share it. Hope it helps. 🙂',
-            footerTxt2:     'Put together by T & W — use it, share it. Hope it helps. 🙂',
+            footerTxt:      'Put together by T & W — use it, share it, hope it helps. 🙂',
+            footerTxt2:     'Put together by T & W — use it, share it, hope it helps. 🙂',
             csTitleTxt:     'Coming Soon',
             csSubTxt:       'Contact details for the local lineman and electricity inspector will be added here shortly.',
             roleLineman:    'Power Supply Officer',
@@ -3325,6 +3325,40 @@
         }
     });
 
+    // ── PWA resume fix ──
+    // When Android restores the app from background (bfcache or activity resume),
+    // the script doesn't re-run. We listen for visibility/pageshow to force a refresh.
+    function onAppResume() {
+        // Re-fetch schedule in case it updated while app was backgrounded
+        loadScheduleData().then(() => {
+            updateFeederSelectorUI();
+            updateStats();
+            tick();
+            fetchSunTimes();
+        });
+    }
+
+    // Fires when tab/app becomes visible again (background → foreground)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') onAppResume();
+    });
+
+    // Fires when page is restored from bfcache (back/forward navigation or app switch)
+    window.addEventListener('pageshow', (e) => {
+        if (e.persisted) onAppResume();
+    });
+
+    // Also handle Android-specific app resume via focus event
+    window.addEventListener('focus', () => {
+        // Only re-run if we've been hidden for more than 30 seconds
+        // to avoid unnecessary refreshes on minor focus changes
+        const now = Date.now();
+        if (!window._lastFocus || now - window._lastFocus > 30000) {
+            onAppResume();
+        }
+        window._lastFocus = now;
+    });
+
     // ── Disable copy / context menu / text selection ──
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('copy', e => e.preventDefault());
@@ -3605,7 +3639,7 @@
     // Ramadan init handled inside loadScheduleData().then() above
 
     // ── PWA: Service Worker registration + update detection ──
-    const SW_VERSION = 'tapper-v25'; // must match CACHE in sw.js
+    const SW_VERSION = 'tapper-v26'; // must match CACHE in sw.js
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
