@@ -1330,6 +1330,86 @@
             z-index: 0;
         }
 
+        /* ── Weather Card ── */
+        .weather-card { padding: 20px 24px 18px; }
+
+        .weather-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            margin-bottom: 16px;
+        }
+
+        .weather-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .weather-icon {
+            font-size: 2.4em;
+            line-height: 1;
+        }
+
+        .weather-condition {
+            font-size: 0.82em;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .weather-right {
+            text-align: right;
+        }
+
+        .weather-temp {
+            font-family: 'Fraunces', serif;
+            font-size: 2.6em;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        .weather-feels {
+            font-size: 0.76em;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .weather-divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 14px;
+        }
+
+        .weather-details {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .weather-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .weather-detail-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.60em;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--text-light);
+        }
+
+        .weather-detail-val {
+            font-family: 'Fraunces', serif;
+            font-size: 0.95em;
+            font-weight: 500;
+            color: var(--text);
+        }
+
         /* ── Feeder Selector ── */
         .feeder-selector-wrap {
             position: relative;
@@ -1993,6 +2073,36 @@
                 <div class="sun-time-block sunset">
                     <div class="sun-time-label">Sunset</div>
                     <div class="sun-time-val" id="sunsetVal">—</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weather Card -->
+        <div class="card weather-card" id="weatherCard">
+            <div class="card-eyebrow">Current Weather</div>
+            <div class="weather-main">
+                <div class="weather-left">
+                    <div class="weather-icon" id="weatherIcon">—</div>
+                    <div class="weather-condition" id="weatherCondition">Loading…</div>
+                </div>
+                <div class="weather-right">
+                    <div class="weather-temp" id="weatherTemp">—</div>
+                    <div class="weather-feels" id="weatherFeels">Feels like —</div>
+                </div>
+            </div>
+            <div class="weather-divider"></div>
+            <div class="weather-details">
+                <div class="weather-detail-item">
+                    <div class="weather-detail-label">Today's Range</div>
+                    <div class="weather-detail-val" id="weatherRange">— / —</div>
+                </div>
+                <div class="weather-detail-item">
+                    <div class="weather-detail-label">Precipitation</div>
+                    <div class="weather-detail-val" id="weatherPrecip">—%</div>
+                </div>
+                <div class="weather-detail-item">
+                    <div class="weather-detail-label">Rainfall</div>
+                    <div class="weather-detail-val" id="weatherRain">— mm</div>
                 </div>
             </div>
         </div>
@@ -3305,7 +3415,86 @@
         </svg>`;
     }
 
-        function tick() { updateStatus(); buildSchedule(); updateHeaderPill(); checkSmartAlerts(); drawSunArc(); }
+        // ── Weather Widget ──
+    const WEATHER_LAT = 34.1613;
+    const WEATHER_LNG = 74.5563;
+    let lastWeatherDate = '';
+
+    async function fetchWeather() {
+        const today = new Date();
+        const dateKey = today.toISOString().slice(0, 10);
+        if (dateKey === lastWeatherDate) return;
+
+        try {
+            const res  = await fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LNG}` +
+                `&hourly=temperature_2m,rain,showers,snowfall,precipitation_probability,precipitation,apparent_temperature` +
+                `&timezone=auto&forecast_days=3`
+            );
+            const data = await res.json();
+            if (!data.hourly) return;
+
+            const times  = data.hourly.time;
+            const temps  = data.hourly.temperature_2m;
+            const feels  = data.hourly.apparent_temperature;
+            const precip = data.hourly.precipitation_probability;
+            const rain   = data.hourly.precipitation;
+            const snow   = data.hourly.snowfall;
+            const shower = data.hourly.showers;
+
+            // Find index closest to current hour
+            const nowStr = today.toISOString().slice(0, 13); // "2026-06-21T14"
+            let curIdx = 0;
+            for (let i = 0; i < times.length; i++) {
+                if (times[i].startsWith(nowStr)) { curIdx = i; break; }
+            }
+
+            // Today's temp range (indices 0-23)
+            const todayTemps = temps.slice(0, 24);
+            const todayMin   = Math.round(Math.min(...todayTemps));
+            const todayMax   = Math.round(Math.max(...todayTemps));
+
+            // Current values
+            const curTemp   = Math.round(temps[curIdx]);
+            const curFeels  = Math.round(feels[curIdx]);
+            const curPrecip = Math.round(precip[curIdx]);
+            const curRain   = (rain[curIdx] || 0).toFixed(1);
+            const curSnow   = snow[curIdx] || 0;
+            const curShower = shower[curIdx] || 0;
+
+            // Derive condition + emoji
+            let icon, condition;
+            if (curSnow > 0.1) {
+                icon = '❄️'; condition = 'Snowfall';
+            } else if (curRain > 2 || curShower > 1) {
+                icon = '🌧️'; condition = 'Heavy Rain';
+            } else if (curRain > 0.3 || curShower > 0.1) {
+                icon = '🌦️'; condition = 'Light Rain';
+            } else if (curPrecip > 60) {
+                icon = '🌥️'; condition = 'Likely Rain';
+            } else if (curPrecip > 30) {
+                icon = '⛅'; condition = 'Partly Cloudy';
+            } else {
+                // Time-based sun/moon
+                const hr = today.getHours();
+                icon      = (hr >= 6 && hr < 20) ? '☀️' : '🌙';
+                condition = (hr >= 6 && hr < 20) ? 'Clear Sky' : 'Clear Night';
+            }
+
+            // Update DOM
+            document.getElementById('weatherIcon').textContent      = icon;
+            document.getElementById('weatherCondition').textContent = condition;
+            document.getElementById('weatherTemp').textContent      = curTemp + '°C';
+            document.getElementById('weatherFeels').textContent     = 'Feels like ' + curFeels + '°C';
+            document.getElementById('weatherRange').textContent     = todayMin + '° / ' + todayMax + '°';
+            document.getElementById('weatherPrecip').textContent    = curPrecip + '%';
+            document.getElementById('weatherRain').textContent      = curRain + ' mm';
+
+            lastWeatherDate = dateKey;
+        } catch(e) { /* silent fail — card shows — */ }
+    }
+
+    function tick() { updateStatus(); buildSchedule(); updateHeaderPill(); checkSmartAlerts(); drawSunArc(); }
 
     // Load remote data first, then start the app
     loadScheduleData().then(() => {
@@ -3315,6 +3504,8 @@
         setInterval(tick, 1000);
         fetchSunTimes();
         setInterval(fetchSunTimes, 60 * 60 * 1000);
+        fetchWeather();
+        setInterval(fetchWeather, 30 * 60 * 1000); // refresh every 30 mins
         buildRamadanTable();
         if (isRamadanOver()) {
             // already hidden by CSS
@@ -3335,6 +3526,7 @@
             updateStats();
             tick();
             fetchSunTimes();
+            fetchWeather();
         });
     }
 
@@ -3639,7 +3831,7 @@
     // Ramadan init handled inside loadScheduleData().then() above
 
     // ── PWA: Service Worker registration + update detection ──
-    const SW_VERSION = 'tapper-v26'; // must match CACHE in sw.js
+    const SW_VERSION = 'tapper-v27'; // must match CACHE in sw.js
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
