@@ -2892,14 +2892,23 @@
         const on  = isOn();
         const now = new Date();
 
-        const headline = on ? 'Power is On'  : 'Power is Off';
-        const locName  = currentLocalityName();
-        const subline  = on ? `Electricity available in ${locName} area` : `No power supply in ${locName} area`;
+        const locName    = currentLocalityName();
+        const feederName = feeders[currentFeederId] ? feeders[currentFeederId].label : '';
+        const headline   = on ? 'Power is On'  : 'Power is Off';
+        const subline    = on
+            ? `Electricity available in ${locName} area`
+            : `No power supply in ${locName} area`;
         const timeStr  = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
         const dateStr  = now.toLocaleDateString('en-US', { weekday:'long', day:'numeric', month:'long' });
         const ctVal    = document.getElementById('countdownTime').textContent;
-        const ctLabel  = on ? 'Goes off in' : 'Comes on in';
+        const ctLabel  = on ? t('countdownOn') : t('countdownOff');
         const hasCt    = ctVal && ctVal !== '—';
+
+        // Weather snapshot — grab current values from DOM if available
+        const wxTemp   = document.getElementById('weatherTemp')?.textContent || '';
+        const wxCond   = document.getElementById('weatherCondition')?.textContent || '';
+        const wxIcon   = document.getElementById('weatherIcon')?.textContent || '';
+        const hasWx    = wxTemp && wxTemp !== '—';
 
         const DARK_BG = on ? '#0D3324' : '#330D16';
         const ACCENT  = on ? '#1A6B4A' : '#9B2335';
@@ -3007,7 +3016,7 @@
         ctx.font         = '600 17px Georgia, serif';
         ctx.fillStyle    = LBL_CLR;
         ctx.textBaseline = 'alphabetic';
-        ctx.fillText(on ? 'CURRENTLY ACTIVE' : 'CURRENTLY INACTIVE', cx, cY + 100);
+        ctx.fillText(on ? t('statusActive').toUpperCase() : t('statusInactive').toUpperCase(), cx, cY + 100);
 
         // ── 7. Headline ──
         ctx.font      = '700 70px Georgia, serif';
@@ -3019,8 +3028,15 @@
         ctx.fillStyle = '#8A837A';
         ctx.fillText(subline, cx, cY + 224);
 
+        // ── 8b. Feeder name ──
+        if (feederName) {
+            ctx.font      = '500 18px Georgia, serif';
+            ctx.fillStyle = 'rgba(138,131,122,0.7)';
+            ctx.fillText(feederName, cx, cY + 252);
+        }
+
         // ── 9. Divider ──
-        const dY = cY + 256;
+        const dY = cY + (feederName ? 278 : 256);
         ctx.strokeStyle = '#DDD6CA';
         ctx.lineWidth   = 1;
         ctx.beginPath();
@@ -3038,6 +3054,7 @@
         ctx.fillText(timeStr, cx, dY + 116);
 
         // ── 12. Countdown pill ──
+        let afterPill = dY + 138;
         if (hasCt) {
             const pillTxt = ctLabel + '  ' + ctVal;
             ctx.font = '500 24px Georgia, serif';
@@ -3051,6 +3068,15 @@
             ctx.fillStyle    = ACCENT;
             ctx.textBaseline = 'middle';
             ctx.fillText(pillTxt, cx, pY + pH/2);
+            afterPill = pY + pH + 20;
+        }
+
+        // ── 12b. Weather row ──
+        if (hasWx) {
+            ctx.font         = '400 20px Georgia, serif';
+            ctx.fillStyle    = '#9A9490';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(wxIcon + '  ' + wxCond + '  ·  ' + wxTemp, cx, afterPill + 16);
         }
 
         // ── 13. Footer ──
@@ -3808,7 +3834,7 @@
     // Ramadan init handled inside loadScheduleData().then() above
 
     // ── PWA: Service Worker registration + update detection ──
-    const SW_VERSION = 'tapper-v28'; // must match CACHE in sw.js
+    const SW_VERSION = 'tapper-v30'; // must match CACHE in sw.js
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
